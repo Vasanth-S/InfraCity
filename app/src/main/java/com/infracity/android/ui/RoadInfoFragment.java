@@ -199,11 +199,39 @@ public class RoadInfoFragment extends DialogFragment implements View.OnClickList
                         AppCompatRatingBar ratingSafety = (AppCompatRatingBar) dialog.findViewById(R.id.ratingSafety);
                         AppCompatRatingBar ratingQuality = (AppCompatRatingBar) dialog.findViewById(R.id.ratingQuality);
                         AppCompatRatingBar ratingPlatform = (AppCompatRatingBar) dialog.findViewById(R.id.ratingPlatform);
+                        UpdateRatingTask updateRatingTask = new UpdateRatingTask();
+                        updateRatingTask.execute((int)ratingEncroachment.getRating(), (int)ratingSafety.getRating(), (int)ratingPlatform.getRating(), (int)ratingQuality.getRating());
+
                     }
                 });
             } else {
                 Toast.makeText(getContext(), "Unable to load info", Toast.LENGTH_SHORT).show();
                 dismiss();
+            }
+        }
+    }
+
+    private class UpdateRatingTask extends AsyncTask<Integer, Void, Boolean> {
+
+        @Override
+        protected Boolean doInBackground(Integer... ratings) {
+            boolean result = false;
+            try {
+                int uid = preferences.getInt(Constants.PREFERENCE_UID, 0);
+                Response<Object> response = service.updateInfo(key, uid, ratings[0], ratings[1], ratings[2], ratings[3]).execute();
+                result = response.code() == 201;
+            } catch (Exception e) {
+                System.out.println("Update failed");
+            }
+            return result;
+        }
+
+        @Override
+        protected void onPostExecute(Boolean aBoolean) {
+            if(aBoolean) {
+                Toast.makeText(getContext(), "Ratings registered", Toast.LENGTH_SHORT).show();
+            } else {
+                Toast.makeText(getContext(), "Ratings failed", Toast.LENGTH_SHORT).show();
             }
         }
     }

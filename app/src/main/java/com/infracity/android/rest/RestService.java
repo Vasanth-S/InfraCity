@@ -35,6 +35,7 @@ public interface RestService {
                                      @Part("user_id") RequestBody user_id,
                                      @Part("photo") RequestBody photo);
 
+    @FormUrlEncoded
     @POST("ratings")
     Call<Object> updateInfo(@Field("road_id") int road_id,
                             @Field("user_id") int user_id,
