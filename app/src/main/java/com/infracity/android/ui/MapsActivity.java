@@ -95,17 +95,17 @@ public class MapsActivity extends AppCompatActivity implements
         service = retrofit.create(RestService.class);
     }
 
-    private void showProgressBar(String message) {
+    public void showProgressBar(String message) {
         if(progressDialog == null) {
             progressDialog = new ProgressDialog(this);
             progressDialog.setCancelable(false);
             progressDialog.setProgressStyle(ProgressDialog.STYLE_SPINNER);
-            progressDialog.setMessage(message);
         }
+        progressDialog.setMessage(message);
         progressDialog.show();
     }
 
-    private void hideProgressBar() {
+    public void hideProgressBar() {
         if(progressDialog != null) {
             progressDialog.dismiss();
         }

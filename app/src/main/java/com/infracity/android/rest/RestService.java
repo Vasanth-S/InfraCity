@@ -30,10 +30,10 @@ public interface RestService {
     Call<RoadInfo> getInfo(@Path("id") int id);
 
     @Multipart
-    @POST("upload_photo")
+    @POST("users_roads_photo_maps")
     Call<UploadResponse> updatePhoto(@Part("road_id") RequestBody road_id,
                                      @Part("user_id") RequestBody user_id,
-                                     @Part("photo") RequestBody photo);
+                                     @Part("photo\"; filename=road") RequestBody photo);
 
     @FormUrlEncoded
     @POST("ratings")

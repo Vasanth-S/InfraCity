@@ -132,7 +132,7 @@ public class LandingActivity extends AppCompatActivity implements GoogleApiClien
             try {
                 Response<User> userResponse = service.signIn(users[0].getEmail()
                         , users[0].getDisplayName()).execute();
-                if(userResponse.code() == 201) {
+                if(userResponse.code() == 200) {
                     User user = userResponse.body();
                     sharedPreferences.edit().putString(Constants.PREFERENCE_DISPLAY_NAME, user.getDisplayName()).apply();
                     sharedPreferences.edit().putString(Constants.PREFERENCE_EMAIL, user.getEmail()).apply();
