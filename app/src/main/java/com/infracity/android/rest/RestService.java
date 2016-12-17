@@ -4,11 +4,14 @@ import com.infracity.android.model.RoadInfo;
 import com.infracity.android.model.Roads;
 import com.infracity.android.model.User;
 
+import okhttp3.RequestBody;
 import retrofit2.Call;
 import retrofit2.http.Field;
 import retrofit2.http.FormUrlEncoded;
 import retrofit2.http.GET;
+import retrofit2.http.Multipart;
 import retrofit2.http.POST;
+import retrofit2.http.Part;
 import retrofit2.http.Path;
 
 /**
@@ -24,4 +27,8 @@ public interface RestService {
 
     @GET("roads/{id}/info")
     Call<RoadInfo> getInfo(@Path("id") String id);
+
+    @Multipart
+    @POST("roads/{id}/upload")
+    Call<Object> updateInfo(@Path("id") String id, @Part("photo") RequestBody photo);
 }

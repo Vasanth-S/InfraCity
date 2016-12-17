@@ -21,6 +21,10 @@ import com.infracity.android.model.RoadInfo;
 import com.infracity.android.rest.RestService;
 import com.infracity.android.utils.PhotoUtils;
 
+import java.io.File;
+
+import okhttp3.MediaType;
+import okhttp3.RequestBody;
 import retrofit2.Response;
 import retrofit2.Retrofit;
 import retrofit2.converter.gson.GsonConverterFactory;
@@ -31,7 +35,7 @@ import retrofit2.converter.gson.GsonConverterFactory;
 public class RoadInfoFragment extends DialogFragment implements View.OnClickListener {
 
     RestService service;
-
+    String key;
     private void initRetrofit() {
         Retrofit retrofit = new Retrofit.Builder()
                 .baseUrl(Constants.SERVER)
@@ -49,7 +53,7 @@ public class RoadInfoFragment extends DialogFragment implements View.OnClickList
         dialog.setContentView(R.layout.fragment_road_info);
         initRetrofit();
         Bundle bundle = getArguments();
-        String key = bundle.getString("id");
+        key = bundle.getString("id");
         FetchInfoTask task = new FetchInfoTask();
         task.execute(key);
         return dialog;
@@ -87,31 +91,6 @@ public class RoadInfoFragment extends DialogFragment implements View.OnClickList
         startActivityForResult(cameraIntent, 1001);
     }
 
-    private class FetchInfoTask extends AsyncTask<String, Void, Void> {
-
-        @Override
-        protected Void doInBackground(String... strings) {
-            try {
-                Response<RoadInfo> response = service.getInfo(strings[0]).execute();
-                if(response.code() == 200) {
-                    RoadInfo roadInfo = response.body();
-                    System.out.println("road info " + roadInfo);
-                }
-            } catch (Exception e) {
-
-            }
-            return null;
-        }
-
-        @Override
-        protected void onPostExecute(Void aVoid) {
-            enterReveal(getDialog().findViewById(R.id.button1), 1000);
-            enterReveal(getDialog().findViewById(R.id.button2), 2000);
-            enterReveal(getDialog().findViewById(R.id.button3), 3000);
-            enterReveal(getDialog().findViewById(R.id.button4), 4000);
-        }
-    }
-
     void enterReveal(final View view, int startOffset) {
         int cx = view.getMeasuredWidth() / 2;
         int cy = view.getMeasuredHeight() / 2;
@@ -133,9 +112,54 @@ public class RoadInfoFragment extends DialogFragment implements View.OnClickList
             } else if(fileUri != null) {
                 filePath = fileUri.getPath();
             }
+            UpdateInfoTask updateInfoTask = new UpdateInfoTask();
+            updateInfoTask.execute(key);
         } else {
             super.onActivityResult(requestCode, resultCode, data);
         }
     }
 
+    private class FetchInfoTask extends AsyncTask<String, Void, RoadInfo> {
+
+        @Override
+        protected RoadInfo doInBackground(String... strings) {
+            RoadInfo roadInfo = null;
+            try {
+                Response<RoadInfo> response = service.getInfo(strings[0]).execute();
+                if(response.code() == 200) {
+                    roadInfo = response.body();
+                    System.out.println("road info " + roadInfo);
+                }
+            } catch (Exception e) {
+                System.out.println("road info fail " + e.getMessage());
+            }
+            return roadInfo;
+        }
+
+        @Override
+        protected void onPostExecute(RoadInfo roadInfo) {
+            enterReveal(getDialog().findViewById(R.id.button1), 1000);
+            enterReveal(getDialog().findViewById(R.id.button2), 2000);
+            enterReveal(getDialog().findViewById(R.id.button3), 3000);
+            enterReveal(getDialog().findViewById(R.id.button4), 4000);
+        }
+    }
+
+    private class UpdateInfoTask extends AsyncTask<String, Void, RoadInfo> {
+        @Override
+        protected RoadInfo doInBackground(String... strings) {
+            try {
+                File file = new File(filePath);
+                RequestBody requestFile =
+                        RequestBody.create(MediaType.parse("multipart/form-data"), file);
+                Response<Object> response = service.updateInfo(strings[0], requestFile).execute();
+                if(response.code() == 201) {
+                    System.out.println("upload Success");
+                }
+            } catch (Exception e) {
+                System.out.println("upload fail " + e.getMessage());
+            }
+            return null;
+        }
+    }
 }
