@@ -1,5 +1,6 @@
 package com.infracity.android.rest;
 
+import com.infracity.android.model.RoadInfo;
 import com.infracity.android.model.Roads;
 import com.infracity.android.model.User;
 
@@ -22,5 +23,5 @@ public interface RestService {
     Call<Roads> getRoads();
 
     @GET("roads/{id}/info")
-    Call<Object> getInfo(@Path("id") String id);
+    Call<RoadInfo> getInfo(@Path("id") String id);
 }

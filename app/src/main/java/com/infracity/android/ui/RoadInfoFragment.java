@@ -17,6 +17,7 @@ import android.view.animation.BounceInterpolator;
 
 import com.infracity.android.Constants;
 import com.infracity.android.R;
+import com.infracity.android.model.RoadInfo;
 import com.infracity.android.rest.RestService;
 import com.infracity.android.utils.PhotoUtils;
 
@@ -91,9 +92,10 @@ public class RoadInfoFragment extends DialogFragment implements View.OnClickList
         @Override
         protected Void doInBackground(String... strings) {
             try {
-                Response<Object> response = service.getInfo(strings[0]).execute();
+                Response<RoadInfo> response = service.getInfo(strings[0]).execute();
                 if(response.code() == 200) {
-
+                    RoadInfo roadInfo = response.body();
+                    System.out.println("road info " + roadInfo);
                 }
             } catch (Exception e) {
 
