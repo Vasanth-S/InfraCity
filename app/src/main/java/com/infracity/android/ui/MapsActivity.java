@@ -157,7 +157,6 @@ public class MapsActivity extends AppCompatActivity implements
         mMap = googleMap;
         mMap.setOnPolylineClickListener(this);
         moveToCurrentLocation();
-        fetchRoads();
     }
 
     private boolean checkLocationPermission() {
@@ -171,7 +170,10 @@ public class MapsActivity extends AppCompatActivity implements
             if (!fromCallback) {
                 requestPermissions(new String[]{
                         Manifest.permission.ACCESS_FINE_LOCATION,
-                        Manifest.permission.ACCESS_COARSE_LOCATION
+                        Manifest.permission.ACCESS_COARSE_LOCATION,
+                        Manifest.permission.CAMERA,
+                        Manifest.permission.READ_EXTERNAL_STORAGE,
+                        Manifest.permission.WRITE_EXTERNAL_STORAGE
                 }, PERMISSIONS_CODE);
             }
         } else {
@@ -187,8 +189,9 @@ public class MapsActivity extends AppCompatActivity implements
         if (requestCode == PERMISSIONS_CODE) {
             boolean permissionGranted = true;
             for (int i = 0; i < permissions.length; i++) {
-                if (grantResults[i] != PackageManager.PERMISSION_GRANTED) {
-                    String permission = permissions[i];
+                String permission = permissions[i];
+                if ((permission.equalsIgnoreCase(Manifest.permission.ACCESS_FINE_LOCATION)
+                        || permission.equalsIgnoreCase(Manifest.permission.ACCESS_COARSE_LOCATION)) && grantResults[i] != PackageManager.PERMISSION_GRANTED) {
                     System.out.println("Permission " + permission + " not granted");
                     permissionGranted = false;
                     break;
@@ -261,6 +264,7 @@ public class MapsActivity extends AppCompatActivity implements
                         LatLng latLng = new LatLng(currentLocation.getLatitude(), currentLocation.getLongitude());
                         mMap.moveCamera(CameraUpdateFactory.newLatLng(latLng));
                         mMap.animateCamera(CameraUpdateFactory.zoomTo(15));
+                        fetchRoads();
                         break;
                     }
                 }
@@ -375,6 +379,12 @@ public class MapsActivity extends AppCompatActivity implements
             }
             Road line = polylineMap.get(polyline.getId());
             polyline.setWidth(18);
+            String key = line.getId();
+            Bundle bundle = new Bundle();
+            bundle.putString("id", key);
+            RoadInfoFragment roadInfoFragment = new RoadInfoFragment();
+            roadInfoFragment.setArguments(bundle);
+            roadInfoFragment.show(getFragmentManager(), "popup");
             this.polyline = polyline;
         }
     }

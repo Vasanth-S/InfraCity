@@ -30,6 +30,10 @@ public class Road {
         return decodePoints(points);
     }
 
+    public String getId() {
+        return points;
+    }
+
     private ArrayList<LatLng> decodePoints(String encoded) {
         ArrayList<LatLng> poly = new ArrayList<>();
         int index = 0, len = encoded.length();

@@ -8,6 +8,7 @@ import retrofit2.http.Field;
 import retrofit2.http.FormUrlEncoded;
 import retrofit2.http.GET;
 import retrofit2.http.POST;
+import retrofit2.http.Path;
 
 /**
  * Created by pragadeesh on 17/12/16.
@@ -19,4 +20,7 @@ public interface RestService {
 
     @GET("dashboard")
     Call<Roads> getRoads();
+
+    @GET("roads/{id}/info")
+    Call<Object> getInfo(@Path("id") String id);
 }
