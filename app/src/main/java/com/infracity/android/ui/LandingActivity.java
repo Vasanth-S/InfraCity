@@ -3,10 +3,12 @@ package com.infracity.android.ui;
 import android.app.ProgressDialog;
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.v7.app.AppCompatActivity;
+import android.text.TextUtils;
 import android.view.Gravity;
 import android.view.View;
 import android.widget.Toast;
@@ -20,6 +22,15 @@ import com.google.android.gms.common.SignInButton;
 import com.google.android.gms.common.api.GoogleApiClient;
 import com.infracity.android.Constants;
 import com.infracity.android.R;
+import com.infracity.android.model.User;
+import com.infracity.android.rest.RestService;
+
+import java.io.IOException;
+
+import okhttp3.OkHttpClient;
+import retrofit2.Response;
+import retrofit2.Retrofit;
+import retrofit2.converter.gson.GsonConverterFactory;
 
 /**
  * Created by pragadeesh on 17/12/16.
@@ -31,14 +42,29 @@ public class LandingActivity extends AppCompatActivity implements GoogleApiClien
     private static final int RESULT_SIGN_IN = 1001;
 
     GoogleApiClient googleApiClient;
+    RestService service;
+
     private ProgressDialog progressDialog;
 
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_sign_in);
-        initGoogleClient();
         sharedPreferences = getSharedPreferences(Constants.PREFERENCE, MODE_PRIVATE);
+        if(sharedPreferences.getBoolean(Constants.PREFERENCE_IS_LOGGED_IN, false)) {
+            startMapActivity();
+        } else {
+            setContentView(R.layout.activity_sign_in);
+            initGoogleClient();
+            initRetrofit();
+        }
+    }
+
+    private void initRetrofit() {
+        Retrofit retrofit = new Retrofit.Builder()
+                .baseUrl("http://192.168.72.33:3000")
+                .addConverterFactory(GsonConverterFactory.create())
+                .build();
+        service = retrofit.create(RestService.class);
     }
 
     private void initGoogleClient() {
@@ -83,11 +109,63 @@ public class LandingActivity extends AppCompatActivity implements GoogleApiClien
         if (result.isSuccess()) {
             // Signed in successfully, show authenticated UI.
             GoogleSignInAccount acct = result.getSignInAccount();
-            Toast.makeText(this, "Sign in successful", Toast.LENGTH_SHORT).show();
+            if(acct != null) {
+                User user = new User();
+                user.setDisplayName(acct.getDisplayName());
+                user.setEmail(acct.getEmail());
+                SignInTask signInTask = new SignInTask();
+                signInTask.execute(user);
+            } else {
+                hideProgressBar();
+                Toast.makeText(this, "Couldn't fetch account details", Toast.LENGTH_SHORT).show();
+            }
         } else {
             Toast.makeText(this, "Sign in failed", Toast.LENGTH_SHORT).show();
             hideProgressBar();
         }
+    }
+
+    private class SignInTask extends AsyncTask<User, Void, String> {
+
+        @Override
+        protected String doInBackground(User... users) {
+            String response = null;
+            try {
+                Response<User> userResponse = service.signIn(users[0].getEmail()
+                        , users[0].getDisplayName()).execute();
+                if(userResponse.code() == 201) {
+                    User user = userResponse.body();
+                    sharedPreferences.edit().putString(Constants.PREFERENCE_DISPLAY_NAME, user.getDisplayName()).apply();
+                    sharedPreferences.edit().putString(Constants.PREFERENCE_EMAIL, user.getEmail()).apply();
+                    sharedPreferences.edit().putString(Constants.PREFERENCE_UID, user.getUUID()).apply();
+                    sharedPreferences.edit().putBoolean(Constants.PREFERENCE_IS_LOGGED_IN, true).apply();
+                } else {
+                    response = userResponse.message();
+                }
+            } catch (IOException e) {
+                response = e.getMessage();
+                e.printStackTrace();
+            }
+            return response;
+        }
+
+        @Override
+        protected void onPostExecute(String error) {
+            if(TextUtils.isEmpty(error)) {
+                startMapActivity();
+                Toast.makeText(LandingActivity.this, "Sign successful", Toast.LENGTH_SHORT).show();
+            } else {
+                Toast.makeText(LandingActivity.this, "Sign failed - " + error, Toast.LENGTH_SHORT).show();
+            }
+            hideProgressBar();
+            super.onPostExecute(error);
+        }
+    }
+
+    private void startMapActivity() {
+        Intent intent = new Intent(LandingActivity.this, MapsActivity.class);
+        startActivity(intent);
+        finish();
     }
 
     private void showProgressBar(String message) {
