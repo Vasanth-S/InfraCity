@@ -10,7 +10,21 @@ import java.util.ArrayList;
  */
 public class Polyline {
     @SerializedName("points")
-    String points;
+    private String points;
+
+    @SerializedName("summary")
+    private String summary;
+
+    @SerializedName("rating")
+    private int rating;
+
+    public int getRating() {
+        return rating;
+    }
+
+    public String getSummary() {
+        return summary;
+    }
 
     public ArrayList<LatLng> getPoints() {
         return decodePoints(points);

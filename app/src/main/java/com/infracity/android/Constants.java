@@ -4,6 +4,9 @@ package com.infracity.android;
  * Created by pragadeesh on 17/12/16.
  */
 public class Constants {
+
+    public static final String SERVER = "http://192.168.72.33:3000";
+
     public static final String PREFERENCE = "infraCity";
 
     public static final String PREFERENCE_IS_LOGGED_IN = "isLoggedIn";

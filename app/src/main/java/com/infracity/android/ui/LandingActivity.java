@@ -27,7 +27,6 @@ import com.infracity.android.rest.RestService;
 
 import java.io.IOException;
 
-import okhttp3.OkHttpClient;
 import retrofit2.Response;
 import retrofit2.Retrofit;
 import retrofit2.converter.gson.GsonConverterFactory;
@@ -61,7 +60,7 @@ public class LandingActivity extends AppCompatActivity implements GoogleApiClien
 
     private void initRetrofit() {
         Retrofit retrofit = new Retrofit.Builder()
-                .baseUrl("http://192.168.72.33:3000")
+                .baseUrl(Constants.SERVER)
                 .addConverterFactory(GsonConverterFactory.create())
                 .build();
         service = retrofit.create(RestService.class);

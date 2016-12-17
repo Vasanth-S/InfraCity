@@ -9,6 +9,7 @@ import android.content.pm.PackageManager;
 import android.graphics.Color;
 import android.location.Location;
 import android.location.LocationManager;
+import android.os.AsyncTask;
 import android.os.Bundle;
 import android.provider.Settings;
 import android.support.annotation.NonNull;
@@ -35,13 +36,21 @@ import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.MarkerOptions;
 import com.google.android.gms.maps.model.Polyline;
 import com.google.android.gms.maps.model.PolylineOptions;
+import com.infracity.android.Constants;
 import com.infracity.android.R;
 import com.infracity.android.model.Path;
+import com.infracity.android.model.Roads;
 import com.infracity.android.model.Step;
 import com.infracity.android.rest.DirectionsApi;
 import com.infracity.android.rest.PathCallback;
+import com.infracity.android.rest.RestService;
 
+import java.io.IOException;
 import java.util.List;
+
+import retrofit2.Response;
+import retrofit2.Retrofit;
+import retrofit2.converter.gson.GsonConverterFactory;
 
 public class MapsActivity extends AppCompatActivity implements
         OnMapReadyCallback,
@@ -61,14 +70,25 @@ public class MapsActivity extends AppCompatActivity implements
 
     private ProgressDialog progressDialog;
 
+    private RestService service;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_maps);
         // Obtain the SupportMapFragment and get notified when the map is ready to be used.
+        initRetrofit();
         setupMapView();
         setupSearchView();
         setupActionbar();
+    }
+
+    private void initRetrofit() {
+        Retrofit retrofit = new Retrofit.Builder()
+                .baseUrl(Constants.SERVER)
+                .addConverterFactory(GsonConverterFactory.create())
+                .build();
+        service = retrofit.create(RestService.class);
     }
 
     private void showProgressBar(String message) {
@@ -131,9 +151,9 @@ public class MapsActivity extends AppCompatActivity implements
     @Override
     public void onMapReady(GoogleMap googleMap) {
         mMap = googleMap;
-        mMap.setOnMapClickListener(mapClickListener);
         mMap.setOnPolylineClickListener(this);
         moveToCurrentLocation();
+        fetchRoads();
     }
 
     private boolean checkLocationPermission() {
@@ -244,6 +264,22 @@ public class MapsActivity extends AppCompatActivity implements
         }
     }
 
+    private void fetchRoads() {
+        showProgressBar("Fetching roads near you...");
+        FetchRoadsTask fetchRoadsTask = new FetchRoadsTask();
+        fetchRoadsTask.execute();
+    }
+
+    private void plotRoads(Roads roads) {
+        if(roads == null || roads.getRoads() == null) return;
+        for (com.infracity.android.model.Polyline line : roads.getRoads()) {
+            PolylineOptions options = new PolylineOptions();
+            options.addAll(line.getPoints());
+            polyline = mMap.addPolyline(options.color(Color.GRAY).width(10));
+            polyline.setClickable(true);
+        }
+    }
+
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
         if(requestCode == SETTINGS_ACTIVITY_RESULT) {
@@ -336,5 +372,32 @@ public class MapsActivity extends AppCompatActivity implements
     @Override
     public void onError(Status status) {
 
+    }
+
+    private class FetchRoadsTask extends AsyncTask<Void, Void, Roads> {
+
+        @Override
+        protected Roads doInBackground(Void... voids) {
+            Roads roads = null;
+            try {
+                Response<Roads> response = service.getRoads().execute();
+                if(response.code() == 200) {
+                    roads = response.body();
+                }
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+            return roads;
+        }
+
+        @Override
+        protected void onPostExecute(Roads roads) {
+            hideProgressBar();
+            if(roads != null) {
+                plotRoads(roads);
+            } else {
+                Toast.makeText(MapsActivity.this, "Couldn't fetch roads", Toast.LENGTH_SHORT).show();
+            }
+        }
     }
 }
