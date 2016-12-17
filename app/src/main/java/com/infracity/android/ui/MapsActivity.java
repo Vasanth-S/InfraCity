@@ -287,11 +287,11 @@ public class MapsActivity extends AppCompatActivity implements
             polyline.setClickable(true);
             switch (line.getRating()) {
                 case 0: polyline.setColor(Color.GRAY); break;
-                case 1: polyline.setColor(Color.MAGENTA); break;
-                case 2: polyline.setColor(Color.RED); break;
-                case 3: polyline.setColor(Color.YELLOW); break;
-                case 4: polyline.setColor(Color.CYAN); break;
-                case 5: polyline.setColor(Color.GREEN); break;
+                case 1: polyline.setColor(Color.parseColor("#FF5722")); break;
+                case 2: polyline.setColor(Color.parseColor("#FFC107")); break;
+                case 3: polyline.setColor(Color.parseColor("#CDDC39")); break;
+                case 4: polyline.setColor(Color.parseColor("#009688")); break;
+                case 5: polyline.setColor(Color.parseColor("#2196F3")); break;
             }
             polylineMap.put(polyline.getId(), line);
         }
@@ -371,23 +371,11 @@ public class MapsActivity extends AppCompatActivity implements
     public void onPolylineClick(Polyline polyline) {
         if(polylineMap != null) {
             if(this.polyline != null) {
-                Road line = polylineMap.get(this.polyline.getId());
-                switch (line.getRating()) {
-                    case 0: this.polyline.setColor(Color.GRAY); break;
-                    case 1: this.polyline.setColor(Color.MAGENTA); break;
-                    case 2: this.polyline.setColor(Color.RED); break;
-                    case 3: this.polyline.setColor(Color.YELLOW); break;
-                    case 4: this.polyline.setColor(Color.CYAN); break;
-                    case 5: this.polyline.setColor(Color.GREEN); break;
-                }
+                this.polyline.setWidth(10);
             }
             Road line = polylineMap.get(polyline.getId());
-            polyline.setColor(Color.BLACK);
+            polyline.setWidth(18);
             this.polyline = polyline;
-            AlertDialog dialog = new AlertDialog.Builder(this)
-                    .setTitle("Add Review")
-                    .setMessage(line.getSummary()).show();
-            dialog.show();
         }
     }
 
