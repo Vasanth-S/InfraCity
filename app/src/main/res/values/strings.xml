@@ -1,0 +1,7 @@
+<resources>
+    <string name="app_name">InfraCity</string>
+    <string name="title_activity_maps">Map</string>
+    <string name="alter_location_settings">Locations service is turned off</string>
+    <string name="open_location_settings">Turn on</string>
+    <string name="sign_in_with_google">Start using InfraCity by signing in with your google account</string>
+</resources>

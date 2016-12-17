@@ -1,0 +1,48 @@
+{
+  "project_info": {
+    "project_number": "255573547465",
+    "project_id": "nth-platform-152007"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:255573547465:android:6aefce61e43c09ee",
+        "android_client_info": {
+          "package_name": "com.infracity.android"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "255573547465-r73ti43fuus0f3skq6n3hv9qjqamvhvo.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.infracity.android",
+            "certificate_hash": "284CC3E298D917A4C963B4BB240E4BC4910E72DF"
+          }
+        },
+        {
+          "client_id": "255573547465-o5vlntnm03sqkevbeafqtmn5807mta9u.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyAWp0mJBrKTQYzF1joWedusWr7sHUZTnE4"
+        }
+      ],
+      "services": {
+        "analytics_service": {
+          "status": 1
+        },
+        "appinvite_service": {
+          "status": 1,
+          "other_platform_oauth_client": []
+        },
+        "ads_service": {
+          "status": 1
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
