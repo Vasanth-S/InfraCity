@@ -9,6 +9,10 @@ import java.util.ArrayList;
  * Created by pragadeesh on 15/12/16.
  */
 public class Road {
+
+    @SerializedName("id")
+    private int roadId;
+
     @SerializedName("points")
     private String points;
 
@@ -30,8 +34,8 @@ public class Road {
         return decodePoints(points);
     }
 
-    public String getId() {
-        return points;
+    public int getId() {
+        return roadId;
     }
 
     private ArrayList<LatLng> decodePoints(String encoded) {

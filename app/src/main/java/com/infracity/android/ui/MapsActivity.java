@@ -98,6 +98,7 @@ public class MapsActivity extends AppCompatActivity implements
     private void showProgressBar(String message) {
         if(progressDialog == null) {
             progressDialog = new ProgressDialog(this);
+            progressDialog.setCancelable(false);
             progressDialog.setProgressStyle(ProgressDialog.STYLE_SPINNER);
             progressDialog.setMessage(message);
         }
@@ -379,11 +380,11 @@ public class MapsActivity extends AppCompatActivity implements
             }
             Road line = polylineMap.get(polyline.getId());
             polyline.setWidth(18);
-            String key = line.getId();
+            Integer key = line.getId();
             String summary = line.getSummary();
             Bundle bundle = new Bundle();
             bundle.putString("summary", summary);
-            bundle.putString("id", key);
+            bundle.putInt("id", key);
             RoadInfoFragment roadInfoFragment = new RoadInfoFragment();
             roadInfoFragment.setArguments(bundle);
             roadInfoFragment.show(getFragmentManager(), "popup");

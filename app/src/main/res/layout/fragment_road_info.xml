@@ -1,58 +1,59 @@
 <?xml version="1.0" encoding="utf-8"?>
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
-    android:layout_height="400dp">
+    android:layout_height="match_parent">
+    <android.support.v4.view.ViewPager
+        android:id="@+id/imagePager"
+        android:layout_width="match_parent"
+        android:layout_height="200dp">
+    </android.support.v4.view.ViewPager>
+    <LinearLayout
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        android:gravity="center_horizontal"
+        android:layout_marginLeft="10dp"
+        android:layout_marginRight="10dp"
+        android:layout_alignParentEnd="true"
+        android:layout_alignBottom="@id/imagePager">
+        <ImageView
+            android:id="@+id/button1"
+            android:layout_width="40dp"
+            android:layout_height="40dp"
+            android:layout_marginTop="5dp"
+            android:layout_marginBottom="5dp"
+            android:src="@drawable/cam"
+            android:visibility="invisible" />
+        <ImageView
+            android:id="@+id/button2"
+            android:layout_width="40dp"
+            android:layout_height="40dp"
+            android:layout_marginTop="5dp"
+            android:layout_marginBottom="5dp"
+            android:src="@drawable/drive"
+            android:visibility="invisible" />
+        <ImageView
+            android:id="@+id/add"
+            android:layout_width="48dp"
+            android:layout_height="48dp"
+            android:layout_marginTop="5dp"
+            android:layout_marginBottom="5dp"
+            android:src="@drawable/add" />
+    </LinearLayout>
     <ScrollView
+        android:layout_below="@id/imagePager"
         android:layout_width="match_parent"
         android:layout_height="match_parent">
         <RelativeLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content">
-            <android.support.v4.view.ViewPager
-                android:id="@+id/imagePager"
-                android:layout_width="match_parent"
-                android:layout_height="200dp">
-            </android.support.v4.view.ViewPager>
-            <LinearLayout
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:orientation="vertical"
-                android:gravity="center_horizontal"
-                android:layout_marginLeft="10dp"
-                android:layout_marginRight="10dp"
-                android:layout_alignParentEnd="true"
-                android:layout_alignBottom="@id/imagePager">
-                <ImageView
-                    android:id="@+id/button1"
-                    android:layout_width="40dp"
-                    android:layout_height="40dp"
-                    android:layout_marginTop="5dp"
-                    android:layout_marginBottom="5dp"
-                    android:src="@drawable/cam"
-                    android:visibility="invisible" />
-                <ImageView
-                    android:id="@+id/button2"
-                    android:layout_width="40dp"
-                    android:layout_height="40dp"
-                    android:layout_marginTop="5dp"
-                    android:layout_marginBottom="5dp"
-                    android:src="@drawable/drive"
-                    android:visibility="invisible" />
-                <ImageView
-                    android:id="@+id/add"
-                    android:layout_width="48dp"
-                    android:layout_height="48dp"
-                    android:layout_marginTop="5dp"
-                    android:layout_marginBottom="5dp"
-                    android:src="@drawable/add" />
-            </LinearLayout>
             <TextView
                 android:id="@+id/summary"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
+                android:layout_margin="5dp"
                 android:textSize="20sp"
                 android:textStyle="bold"
-                android:layout_below="@id/imagePager"
                 android:padding="10dp"/>
             <LinearLayout
                 android:id="@+id/ratingLayout"
@@ -64,59 +65,72 @@
                 <TextView
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:textSize="20sp"
+                    android:textSize="16sp"
                     android:textStyle="bold"
-                    android:layout_marginTop="10dp"
-                    android:layout_marginBottom="10dp"
+                    android:layout_margin="5dp"
                     android:text="Encroachments"/>
                 <android.support.v7.widget.AppCompatRatingBar
+                    android:id="@+id/ratingEncroachment"
                     android:numStars="5"
+                    style="?android:attr/ratingBarStyleIndicator"
+                    android:isIndicator="false"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:layout_marginTop="10dp"
+                    android:layout_marginTop="5dp"
                     android:layout_marginBottom="10dp"/>
                 <TextView
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:textSize="20sp"
+                    android:textSize="16sp"
                     android:textStyle="bold"
-                    android:layout_marginTop="10dp"
-                    android:layout_marginBottom="10dp"
-                    android:text="Pollution"/>
+                    android:layout_margin="5dp"
+                    android:text="Platform Usability"/>
                 <android.support.v7.widget.AppCompatRatingBar
+                    android:id="@+id/ratingPlatform"
                     android:numStars="5"
+                    style="?android:attr/ratingBarStyleIndicator"
+                    android:isIndicator="false"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:layout_marginTop="10dp"
+                    android:layout_marginTop="5dp"
                     android:layout_marginBottom="10dp"/>
                 <TextView
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:textSize="20sp"
+                    android:textSize="16sp"
                     android:textStyle="bold"
-                    android:layout_marginTop="10dp"
-                    android:layout_marginBottom="10dp"
+                    android:layout_margin="5dp"
                     android:text="Safety"/>
-                <RatingBar
+                <android.support.v7.widget.AppCompatRatingBar
+                    android:id="@+id/ratingSafety"
                     android:numStars="5"
+                    style="?android:attr/ratingBarStyleIndicator"
+                    android:isIndicator="false"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:layout_marginTop="10dp"
+                    android:layout_marginTop="5dp"
                     android:layout_marginBottom="10dp"/>
                 <TextView
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:textSize="20sp"
+                    android:textSize="16sp"
                     android:textStyle="bold"
-                    android:layout_marginTop="10dp"
-                    android:layout_marginBottom="10dp"
+                    android:layout_margin="10dp"
                     android:text="Quality"/>
-                <RatingBar
+                <android.support.v7.widget.AppCompatRatingBar
+                    android:id="@+id/ratingQuality"
                     android:numStars="5"
+                    style="?android:attr/ratingBarStyleIndicator"
+                    android:isIndicator="false"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:layout_marginTop="10dp"
+                    android:layout_marginTop="5dp"
                     android:layout_marginBottom="10dp"/>
+                <Button
+                    android:id="@+id/submit"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:text="Submit"/>
             </LinearLayout>
         </RelativeLayout>
     </ScrollView>

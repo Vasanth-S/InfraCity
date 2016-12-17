@@ -2,6 +2,8 @@ package com.infracity.android.model;
 
 import com.google.gson.annotations.SerializedName;
 
+import java.util.ArrayList;
+
 /**
  * Created by pragadeesh on 17/12/16.
  */
@@ -19,7 +21,7 @@ public class RoadInfo {
     private int encroachments;
 
     @SerializedName("photos")
-    private String[] photos;
+    private ArrayList<String> photos;
 
     @SerializedName("complaints")
     private String[] complaints;
@@ -28,7 +30,7 @@ public class RoadInfo {
         return complaints;
     }
 
-    public String[] getPhotos() {
+    public ArrayList<String> getPhotos() {
         return photos;
     }
 

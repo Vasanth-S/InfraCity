@@ -4,13 +4,16 @@ import android.animation.Animator;
 import android.app.Activity;
 import android.app.Dialog;
 import android.app.DialogFragment;
+import android.content.Context;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.net.Uri;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.provider.MediaStore;
 import android.support.v4.view.PagerAdapter;
 import android.support.v4.view.ViewPager;
+import android.support.v7.widget.AppCompatRatingBar;
 import android.view.Gravity;
 import android.view.View;
 import android.view.ViewAnimationUtils;
@@ -25,10 +28,12 @@ import com.facebook.drawee.view.SimpleDraweeView;
 import com.infracity.android.Constants;
 import com.infracity.android.R;
 import com.infracity.android.model.RoadInfo;
+import com.infracity.android.model.UploadResponse;
 import com.infracity.android.rest.RestService;
 import com.infracity.android.utils.PhotoUtils;
 
 import java.io.File;
+import java.util.ArrayList;
 
 import okhttp3.MediaType;
 import okhttp3.RequestBody;
@@ -42,8 +47,11 @@ import retrofit2.converter.gson.GsonConverterFactory;
 public class RoadInfoFragment extends DialogFragment implements View.OnClickListener {
 
     RestService service;
-    String key;
+    int key;
     String summary;
+
+    ImageAdapter imageAdapter;
+    SharedPreferences preferences;
 
     private void initRetrofit() {
         Retrofit retrofit = new Retrofit.Builder()
@@ -56,13 +64,14 @@ public class RoadInfoFragment extends DialogFragment implements View.OnClickList
     @Override
     public Dialog onCreateDialog(Bundle savedInstanceState)
     {
+        preferences = getContext().getSharedPreferences(Constants.PREFERENCE, Context.MODE_PRIVATE);
         Dialog dialog = new Dialog(getContext(), R.style.InfoTheme);
         dialog.getWindow().setGravity(Gravity.BOTTOM);
-        dialog.getWindow().setLayout(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT);
+        dialog.getWindow().setLayout(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.MATCH_PARENT);
         dialog.setContentView(R.layout.fragment_road_info);
         initRetrofit();
         Bundle bundle = getArguments();
-        key = bundle.getString("id");
+        key = bundle.getInt("id");
         summary = bundle.getString("summary");
         FetchInfoTask task = new FetchInfoTask();
         task.execute(key);
@@ -155,7 +164,7 @@ public class RoadInfoFragment extends DialogFragment implements View.OnClickList
     private void updateUI(RoadInfo roadInfo) {
         if(!isDetached() && getActivity() != null) {
             if(roadInfo != null) {
-                Dialog dialog = getDialog();
+                final Dialog dialog = getDialog();
                 View add = dialog.findViewById(R.id.add);
                 final View cam = dialog.findViewById(R.id.button1);
                 final View pick = dialog.findViewById(R.id.button2);
@@ -179,9 +188,19 @@ public class RoadInfoFragment extends DialogFragment implements View.OnClickList
                 TextView summaryText = (TextView) dialog.findViewById(R.id.summary);
                 summaryText.setText(summary);
                 ViewPager pager = (ViewPager) dialog.findViewById(R.id.imagePager);
-                ImageAdapter imageAdapter = new ImageAdapter();
+                imageAdapter = new ImageAdapter();
                 imageAdapter.setImageUrls(roadInfo.getPhotos());
                 pager.setAdapter(imageAdapter);
+                View submit = dialog.findViewById(R.id.submit);
+                submit.setOnClickListener(new View.OnClickListener() {
+                    @Override
+                    public void onClick(View view) {
+                        AppCompatRatingBar ratingEncroachment = (AppCompatRatingBar) dialog.findViewById(R.id.ratingEncroachment);
+                        AppCompatRatingBar ratingSafety = (AppCompatRatingBar) dialog.findViewById(R.id.ratingSafety);
+                        AppCompatRatingBar ratingQuality = (AppCompatRatingBar) dialog.findViewById(R.id.ratingQuality);
+                        AppCompatRatingBar ratingPlatform = (AppCompatRatingBar) dialog.findViewById(R.id.ratingPlatform);
+                    }
+                });
             } else {
                 Toast.makeText(getContext(), "Unable to load info", Toast.LENGTH_SHORT).show();
                 dismiss();
@@ -189,13 +208,13 @@ public class RoadInfoFragment extends DialogFragment implements View.OnClickList
         }
     }
 
-    private class FetchInfoTask extends AsyncTask<String, Void, RoadInfo> {
+    private class FetchInfoTask extends AsyncTask<Integer, Void, RoadInfo> {
 
         @Override
-        protected RoadInfo doInBackground(String... strings) {
+        protected RoadInfo doInBackground(Integer... ids) {
             RoadInfo roadInfo = null;
             try {
-                Response<RoadInfo> response = service.getInfo(strings[0]).execute();
+                Response<RoadInfo> response = service.getInfo(ids[0]).execute();
                 if(response.code() == 200) {
                     roadInfo = response.body();
                     System.out.println("road info " + roadInfo);
@@ -212,36 +231,52 @@ public class RoadInfoFragment extends DialogFragment implements View.OnClickList
         }
     }
 
-    private class UpdateInfoTask extends AsyncTask<String, Void, RoadInfo> {
+    private class UpdateInfoTask extends AsyncTask<Integer, Void, String> {
         @Override
-        protected RoadInfo doInBackground(String... strings) {
+        protected String doInBackground(Integer... ids) {
+            String url = null;
             try {
                 File file = new File(filePath);
                 RequestBody requestFile =
                         RequestBody.create(MediaType.parse("multipart/form-data"), file);
-                Response<Object> response = service.updateInfo(strings[0], requestFile).execute();
-                if(response.code() == 201) {
-                    System.out.println("upload Success");
+                RequestBody uid = RequestBody.create(MediaType.parse("text/plain"), "" + preferences.getInt(Constants.PREFERENCE_UID, 0));
+                RequestBody roadId = RequestBody.create(MediaType.parse("text/plain"), "" + ids[0]);
+                Response<UploadResponse> request = service.updatePhoto(roadId, uid, requestFile).execute();
+                if(request.code() == 201) {
+                    UploadResponse uploadResponse = request.body();
+                    url = uploadResponse.getUrl();
+                    System.out.println("upload Success " + uploadResponse.getUrl());
                 }
             } catch (Exception e) {
                 System.out.println("upload fail " + e.getMessage());
             }
-            return null;
+            return url;
+        }
+
+        @Override
+        protected void onPostExecute(String s) {
+            imageAdapter.addUrl(s);
         }
     }
 
     private class ImageAdapter extends PagerAdapter {
 
-        private String[] urls;
+        private ArrayList<String> urls;
 
-        public void setImageUrls(String[] urls) {
+        public void setImageUrls(ArrayList<String> urls) {
             this.urls = urls;
+            notifyDataSetChanged();
+        }
+
+        public void addUrl(String url) {
+            if(urls == null) urls = new ArrayList<>();
+            urls.add(0, url);
             notifyDataSetChanged();
         }
 
         @Override
         public int getCount() {
-            return urls == null ? 0 : urls.length;
+            return urls == null ? 0 : urls.size();
         }
 
         @Override
@@ -253,7 +288,7 @@ public class RoadInfoFragment extends DialogFragment implements View.OnClickList
         public Object instantiateItem(ViewGroup container, int position) {
             SimpleDraweeView view = new SimpleDraweeView(getContext());
             container.addView(view, new ViewGroup.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.MATCH_PARENT));
-            view.setImageURI(Uri.parse(urls[position]));
+            view.setImageURI(Uri.parse(urls.get(position)));
             return view;
         }
 

@@ -12,8 +12,8 @@ public class User {
     @SerializedName("display_name")
     private String displayName;
 
-    @SerializedName("uuid")
-    private String UUID;
+    @SerializedName("id")
+    private int UUID;
 
     public void setEmail(String email) {
         this.email = email;
@@ -31,7 +31,7 @@ public class User {
         return email;
     }
 
-    public String getUUID() {
+    public int getUUID() {
         return UUID;
     }
 }

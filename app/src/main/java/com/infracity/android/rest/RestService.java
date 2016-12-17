@@ -2,6 +2,7 @@ package com.infracity.android.rest;
 
 import com.infracity.android.model.RoadInfo;
 import com.infracity.android.model.Roads;
+import com.infracity.android.model.UploadResponse;
 import com.infracity.android.model.User;
 
 import okhttp3.RequestBody;
@@ -26,9 +27,20 @@ public interface RestService {
     Call<Roads> getRoads();
 
     @GET("roads/{id}/info")
-    Call<RoadInfo> getInfo(@Path("id") String id);
+    Call<RoadInfo> getInfo(@Path("id") int id);
 
     @Multipart
-    @POST("roads/{id}/upload")
-    Call<Object> updateInfo(@Path("id") String id, @Part("photo") RequestBody photo);
+    @POST("upload_photo")
+    Call<UploadResponse> updatePhoto(@Part("road_id") RequestBody road_id,
+                                     @Part("user_id") RequestBody user_id,
+                                     @Part("photo") RequestBody photo);
+
+    @POST("ratings")
+    Call<Object> updateInfo(@Field("road_id") int road_id,
+                            @Field("user_id") int user_id,
+                            @Field("encroachment") int encroachment,
+                            @Field("safety") int safety,
+                            @Field("platform_usability") int platform_usability,
+                            @Field("road_quality") int road_quality);
+
 }

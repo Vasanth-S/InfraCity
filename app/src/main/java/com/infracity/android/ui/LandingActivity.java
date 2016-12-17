@@ -136,7 +136,7 @@ public class LandingActivity extends AppCompatActivity implements GoogleApiClien
                     User user = userResponse.body();
                     sharedPreferences.edit().putString(Constants.PREFERENCE_DISPLAY_NAME, user.getDisplayName()).apply();
                     sharedPreferences.edit().putString(Constants.PREFERENCE_EMAIL, user.getEmail()).apply();
-                    sharedPreferences.edit().putString(Constants.PREFERENCE_UID, user.getUUID()).apply();
+                    sharedPreferences.edit().putInt(Constants.PREFERENCE_UID, user.getUUID()).apply();
                     sharedPreferences.edit().putBoolean(Constants.PREFERENCE_IS_LOGGED_IN, true).apply();
                 } else {
                     response = userResponse.message();
