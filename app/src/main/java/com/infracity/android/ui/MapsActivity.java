@@ -380,7 +380,9 @@ public class MapsActivity extends AppCompatActivity implements
             Road line = polylineMap.get(polyline.getId());
             polyline.setWidth(18);
             String key = line.getId();
+            String summary = line.getSummary();
             Bundle bundle = new Bundle();
+            bundle.putString("summary", summary);
             bundle.putString("id", key);
             RoadInfoFragment roadInfoFragment = new RoadInfoFragment();
             roadInfoFragment.setArguments(bundle);

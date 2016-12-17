@@ -28,6 +28,7 @@ dependencies {
     compile 'com.google.android.gms:play-services:10.0.1'
     compile 'com.squareup.retrofit2:retrofit:2.1.0'
     compile 'com.squareup.retrofit2:converter-gson:2.1.0'
+    compile 'com.facebook.fresco:fresco:0.10.0'
 }
 
 apply plugin: 'com.google.gms.google-services'

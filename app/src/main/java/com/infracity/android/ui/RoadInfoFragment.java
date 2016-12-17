@@ -9,12 +9,18 @@ import android.net.Uri;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.provider.MediaStore;
+import android.support.v4.view.PagerAdapter;
+import android.support.v4.view.ViewPager;
 import android.view.Gravity;
 import android.view.View;
 import android.view.ViewAnimationUtils;
 import android.view.ViewGroup;
 import android.view.animation.BounceInterpolator;
+import android.widget.ImageView;
+import android.widget.TextView;
+import android.widget.Toast;
 
+import com.facebook.drawee.view.SimpleDraweeView;
 import com.infracity.android.Constants;
 import com.infracity.android.R;
 import com.infracity.android.model.RoadInfo;
@@ -36,6 +42,8 @@ public class RoadInfoFragment extends DialogFragment implements View.OnClickList
 
     RestService service;
     String key;
+    String summary;
+
     private void initRetrofit() {
         Retrofit retrofit = new Retrofit.Builder()
                 .baseUrl(Constants.SERVER)
@@ -54,6 +62,7 @@ public class RoadInfoFragment extends DialogFragment implements View.OnClickList
         initRetrofit();
         Bundle bundle = getArguments();
         key = bundle.getString("id");
+        summary = bundle.getString("summary");
         FetchInfoTask task = new FetchInfoTask();
         task.execute(key);
         return dialog;
@@ -119,6 +128,27 @@ public class RoadInfoFragment extends DialogFragment implements View.OnClickList
         }
     }
 
+    private void updateUI(RoadInfo roadInfo) {
+        if(!isDetached() && getActivity() != null) {
+            if(roadInfo != null) {
+                Dialog dialog = getDialog();
+                enterReveal(dialog.findViewById(R.id.button1), 1000);
+                enterReveal(dialog.findViewById(R.id.button2), 2000);
+                enterReveal(dialog.findViewById(R.id.button3), 3000);
+                enterReveal(dialog.findViewById(R.id.button4), 4000);
+                TextView summaryText = (TextView) dialog.findViewById(R.id.summary);
+                summaryText.setText(summary);
+                ViewPager pager = (ViewPager) dialog.findViewById(R.id.imagePager);
+                ImageAdapter imageAdapter = new ImageAdapter();
+                imageAdapter.setImageUrls(roadInfo.getPhotos());
+                pager.setAdapter(imageAdapter);
+            } else {
+                Toast.makeText(getContext(), "Unable to load info", Toast.LENGTH_SHORT).show();
+                dismiss();
+            }
+        }
+    }
+
     private class FetchInfoTask extends AsyncTask<String, Void, RoadInfo> {
 
         @Override
@@ -138,10 +168,7 @@ public class RoadInfoFragment extends DialogFragment implements View.OnClickList
 
         @Override
         protected void onPostExecute(RoadInfo roadInfo) {
-            enterReveal(getDialog().findViewById(R.id.button1), 1000);
-            enterReveal(getDialog().findViewById(R.id.button2), 2000);
-            enterReveal(getDialog().findViewById(R.id.button3), 3000);
-            enterReveal(getDialog().findViewById(R.id.button4), 4000);
+            updateUI(roadInfo);
         }
     }
 
@@ -160,6 +187,39 @@ public class RoadInfoFragment extends DialogFragment implements View.OnClickList
                 System.out.println("upload fail " + e.getMessage());
             }
             return null;
+        }
+    }
+
+    private class ImageAdapter extends PagerAdapter {
+
+        private String[] urls;
+
+        public void setImageUrls(String[] urls) {
+            this.urls = urls;
+            notifyDataSetChanged();
+        }
+
+        @Override
+        public int getCount() {
+            return urls == null ? 0 : urls.length;
+        }
+
+        @Override
+        public boolean isViewFromObject(View view, Object object) {
+            return view == object;
+        }
+
+        @Override
+        public Object instantiateItem(ViewGroup container, int position) {
+            SimpleDraweeView view = new SimpleDraweeView(getContext());
+            container.addView(view, new ViewGroup.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.MATCH_PARENT));
+            view.setImageURI(Uri.parse(urls[position]));
+            return view;
+        }
+
+        @Override
+        public void destroyItem(ViewGroup container, int position, Object object) {
+            container.removeView((View) object);
         }
     }
 }

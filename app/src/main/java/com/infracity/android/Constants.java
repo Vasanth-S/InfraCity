@@ -5,7 +5,7 @@ package com.infracity.android;
  */
 public class Constants {
 
-    public static final String SERVER = "http://192.168.72.33:3000";
+    public static final String SERVER = "http://192.168.51.73:3000";
 
     public static final String PREFERENCE = "infraCity";
 
