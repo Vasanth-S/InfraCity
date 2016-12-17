@@ -15,8 +15,9 @@ import android.view.Gravity;
 import android.view.View;
 import android.view.ViewAnimationUtils;
 import android.view.ViewGroup;
+import android.view.animation.Animation;
 import android.view.animation.BounceInterpolator;
-import android.widget.ImageView;
+import android.view.animation.ScaleAnimation;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -100,14 +101,35 @@ public class RoadInfoFragment extends DialogFragment implements View.OnClickList
         startActivityForResult(cameraIntent, 1001);
     }
 
-    void enterReveal(final View view, int startOffset) {
+    void enterReveal(final View view, int delay) {
         int cx = view.getMeasuredWidth() / 2;
         int cy = view.getMeasuredHeight() / 2;
         int finalRadius = Math.max(view.getWidth(), view.getHeight()) / 2;
         Animator anim = ViewAnimationUtils.createCircularReveal(view, cx, cy, 0, finalRadius);
-        view.setVisibility(View.VISIBLE);
+        anim.setDuration(250);
         view.setOnClickListener(this);
-        anim.setInterpolator(new BounceInterpolator());
+        anim.setStartDelay(delay);
+        anim.addListener(new Animator.AnimatorListener() {
+            @Override
+            public void onAnimationStart(Animator animator) {
+                view.setVisibility(View.VISIBLE);
+            }
+
+            @Override
+            public void onAnimationEnd(Animator animator) {
+
+            }
+
+            @Override
+            public void onAnimationCancel(Animator animator) {
+
+            }
+
+            @Override
+            public void onAnimationRepeat(Animator animator) {
+
+            }
+        });
         anim.start();
     }
 
@@ -128,14 +150,32 @@ public class RoadInfoFragment extends DialogFragment implements View.OnClickList
         }
     }
 
+    boolean isOpen = false;
+
     private void updateUI(RoadInfo roadInfo) {
         if(!isDetached() && getActivity() != null) {
             if(roadInfo != null) {
                 Dialog dialog = getDialog();
-                enterReveal(dialog.findViewById(R.id.button1), 1000);
-                enterReveal(dialog.findViewById(R.id.button2), 2000);
-                enterReveal(dialog.findViewById(R.id.button3), 3000);
-                enterReveal(dialog.findViewById(R.id.button4), 4000);
+                View add = dialog.findViewById(R.id.add);
+                final View cam = dialog.findViewById(R.id.button1);
+                final View pick = dialog.findViewById(R.id.button2);
+                add.setOnClickListener(new View.OnClickListener() {
+                    @Override
+                    public void onClick(View view) {
+                        if(isOpen) {
+                            cam.setVisibility(View.INVISIBLE);
+                            pick.setVisibility(View.INVISIBLE);
+                        } else {
+                            ScaleAnimation animation = new ScaleAnimation(0.9f, 1.1f, 0.9f, 1.1f, Animation.RELATIVE_TO_SELF, 0.5f, Animation.RELATIVE_TO_SELF, 0.5f);
+                            animation.setDuration(200);
+                            animation.setInterpolator(new BounceInterpolator());
+                            view.startAnimation(animation);
+                            enterReveal(cam, 500);
+                            enterReveal(pick, 250);
+                        }
+                        isOpen = !isOpen;
+                    }
+                });
                 TextView summaryText = (TextView) dialog.findViewById(R.id.summary);
                 summaryText.setText(summary);
                 ViewPager pager = (ViewPager) dialog.findViewById(R.id.imagePager);

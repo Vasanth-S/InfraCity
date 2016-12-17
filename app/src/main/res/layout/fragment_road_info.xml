@@ -13,6 +13,39 @@
                 android:layout_width="match_parent"
                 android:layout_height="200dp">
             </android.support.v4.view.ViewPager>
+            <LinearLayout
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:orientation="vertical"
+                android:gravity="center_horizontal"
+                android:layout_marginLeft="10dp"
+                android:layout_marginRight="10dp"
+                android:layout_alignParentEnd="true"
+                android:layout_alignBottom="@id/imagePager">
+                <ImageView
+                    android:id="@+id/button1"
+                    android:layout_width="40dp"
+                    android:layout_height="40dp"
+                    android:layout_marginTop="5dp"
+                    android:layout_marginBottom="5dp"
+                    android:src="@drawable/cam"
+                    android:visibility="invisible" />
+                <ImageView
+                    android:id="@+id/button2"
+                    android:layout_width="40dp"
+                    android:layout_height="40dp"
+                    android:layout_marginTop="5dp"
+                    android:layout_marginBottom="5dp"
+                    android:src="@drawable/drive"
+                    android:visibility="invisible" />
+                <ImageView
+                    android:id="@+id/add"
+                    android:layout_width="48dp"
+                    android:layout_height="48dp"
+                    android:layout_marginTop="5dp"
+                    android:layout_marginBottom="5dp"
+                    android:src="@drawable/add" />
+            </LinearLayout>
             <TextView
                 android:id="@+id/summary"
                 android:layout_width="match_parent"
@@ -84,46 +117,6 @@
                     android:layout_height="wrap_content"
                     android:layout_marginTop="10dp"
                     android:layout_marginBottom="10dp"/>
-            </LinearLayout>
-            <LinearLayout
-                android:layout_marginTop="10dp"
-                android:layout_marginBottom="10dp"
-                android:layout_below="@id/ratingLayout"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:orientation="horizontal">
-                <Button
-                    android:id="@+id/button1"
-                    android:layout_weight="1"
-                    android:layout_width="0px"
-                    android:layout_height="wrap_content"
-                    android:layout_margin="5dp"
-                    android:visibility="invisible"
-                    android:text="Click"/>
-                <Button
-                    android:id="@+id/button2"
-                    android:layout_weight="1"
-                    android:layout_width="0px"
-                    android:layout_height="wrap_content"
-                    android:layout_margin="5dp"
-                    android:visibility="invisible"
-                    android:text="Upload"/>
-                <Button
-                    android:id="@+id/button3"
-                    android:layout_weight="1"
-                    android:layout_width="0px"
-                    android:layout_height="wrap_content"
-                    android:layout_margin="5dp"
-                    android:visibility="invisible"
-                    android:text="Rate"/>
-                <Button
-                    android:id="@+id/button4"
-                    android:layout_weight="1"
-                    android:layout_width="0px"
-                    android:layout_height="wrap_content"
-                    android:layout_margin="5dp"
-                    android:visibility="invisible"
-                    android:text="Report"/>
             </LinearLayout>
         </RelativeLayout>
     </ScrollView>
