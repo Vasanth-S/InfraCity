@@ -8,7 +8,7 @@ import java.util.ArrayList;
 /**
  * Created by pragadeesh on 15/12/16.
  */
-public class Polyline {
+public class Road {
     @SerializedName("points")
     private String points;
 

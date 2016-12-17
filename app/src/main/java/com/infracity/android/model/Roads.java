@@ -7,9 +7,9 @@ import java.util.ArrayList;
  */
 public class Roads {
     @SuppressWarnings("roads")
-    private ArrayList<Polyline> roads;
+    private ArrayList<Road> roads;
 
-    public ArrayList<Polyline> getRoads() {
+    public ArrayList<Road> getRoads() {
         return roads;
     }
 }

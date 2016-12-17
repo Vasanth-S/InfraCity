@@ -13,7 +13,7 @@ public class Step {
     private Coordinates startLocation;
 
     @SerializedName("polyline")
-    private Polyline polyline;
+    private Road polyline;
 
     public Coordinates getEndLocation() {
         return endLocation;
@@ -23,7 +23,7 @@ public class Step {
         return startLocation;
     }
 
-    public Polyline getPolyline() {
+    public Road getPolyline() {
         return polyline;
     }
 }

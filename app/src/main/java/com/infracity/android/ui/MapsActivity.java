@@ -39,6 +39,7 @@ import com.google.android.gms.maps.model.PolylineOptions;
 import com.infracity.android.Constants;
 import com.infracity.android.R;
 import com.infracity.android.model.Path;
+import com.infracity.android.model.Road;
 import com.infracity.android.model.Roads;
 import com.infracity.android.model.Step;
 import com.infracity.android.rest.DirectionsApi;
@@ -46,6 +47,7 @@ import com.infracity.android.rest.PathCallback;
 import com.infracity.android.rest.RestService;
 
 import java.io.IOException;
+import java.util.HashMap;
 import java.util.List;
 
 import retrofit2.Response;
@@ -71,6 +73,8 @@ public class MapsActivity extends AppCompatActivity implements
     private ProgressDialog progressDialog;
 
     private RestService service;
+
+    private HashMap<String, Road> polylineMap;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -272,11 +276,24 @@ public class MapsActivity extends AppCompatActivity implements
 
     private void plotRoads(Roads roads) {
         if(roads == null || roads.getRoads() == null) return;
-        for (com.infracity.android.model.Polyline line : roads.getRoads()) {
+        if(polylineMap == null) {
+            polylineMap = new HashMap<>();
+        }
+        polylineMap.clear();
+        for (Road line : roads.getRoads()) {
             PolylineOptions options = new PolylineOptions();
             options.addAll(line.getPoints());
-            polyline = mMap.addPolyline(options.color(Color.GRAY).width(10));
+            Polyline polyline = mMap.addPolyline(options.width(10));
             polyline.setClickable(true);
+            switch (line.getRating()) {
+                case 0: polyline.setColor(Color.GRAY); break;
+                case 1: polyline.setColor(Color.MAGENTA); break;
+                case 2: polyline.setColor(Color.RED); break;
+                case 3: polyline.setColor(Color.YELLOW); break;
+                case 4: polyline.setColor(Color.CYAN); break;
+                case 5: polyline.setColor(Color.GREEN); break;
+            }
+            polylineMap.put(polyline.getId(), line);
         }
     }
 
@@ -304,7 +321,7 @@ public class MapsActivity extends AppCompatActivity implements
                 endLocation = latLng;
                 mMap.addMarker(new MarkerOptions().position(latLng).title("end").draggable(false).icon(BitmapDescriptorFactory
                         .defaultMarker(BitmapDescriptorFactory.HUE_RED)));
-                showProgressBar("Fetching the road...");
+                showProgressBar("Fetching the Road...");
                 DirectionsApi.loadPaths(MapsActivity.this, startLocation, endLocation, MapsActivity.this);
             }
         }
@@ -352,10 +369,24 @@ public class MapsActivity extends AppCompatActivity implements
 
     @Override
     public void onPolylineClick(Polyline polyline) {
-        String clickedPolylineId = polyline.getId();
-        String drawnPolylineId = this.polyline == null ? "" : polyline.getId();
-        if (clickedPolylineId.equalsIgnoreCase(drawnPolylineId)) {
-            AlertDialog dialog = new AlertDialog.Builder(this).setTitle("Add Review").setMessage("Do you want to add review").show();
+        if(polylineMap != null) {
+            if(this.polyline != null) {
+                Road line = polylineMap.get(this.polyline.getId());
+                switch (line.getRating()) {
+                    case 0: this.polyline.setColor(Color.GRAY); break;
+                    case 1: this.polyline.setColor(Color.MAGENTA); break;
+                    case 2: this.polyline.setColor(Color.RED); break;
+                    case 3: this.polyline.setColor(Color.YELLOW); break;
+                    case 4: this.polyline.setColor(Color.CYAN); break;
+                    case 5: this.polyline.setColor(Color.GREEN); break;
+                }
+            }
+            Road line = polylineMap.get(polyline.getId());
+            polyline.setColor(Color.BLACK);
+            this.polyline = polyline;
+            AlertDialog dialog = new AlertDialog.Builder(this)
+                    .setTitle("Add Review")
+                    .setMessage(line.getSummary()).show();
             dialog.show();
         }
     }
