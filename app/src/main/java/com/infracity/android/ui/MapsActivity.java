@@ -326,11 +326,11 @@ public class MapsActivity extends AppCompatActivity implements
             polyline.setClickable(true);
             switch (line.getRating()) {
                 case 0: polyline.setColor(Color.GRAY); break;
-                case 1: polyline.setColor(Color.parseColor("#FF5722")); break;
-                case 2: polyline.setColor(Color.parseColor("#FFC107")); break;
+                case 1: case 2: polyline.setColor(Color.parseColor("#FF5722")); break;
+//                case 2: polyline.setColor(Color.parseColor("#FFC107")); break;
                 case 3: polyline.setColor(Color.parseColor("#CDDC39")); break;
-                case 4: polyline.setColor(Color.parseColor("#009688")); break;
-                case 5: polyline.setColor(Color.parseColor("#2196F3")); break;
+//                case 4: polyline.setColor(Color.parseColor("#009688")); break;
+                case 4: case 5: polyline.setColor(Color.parseColor("#2196F3")); break;
             }
             polylineMap.put(polyline.getId(), line);
         }
