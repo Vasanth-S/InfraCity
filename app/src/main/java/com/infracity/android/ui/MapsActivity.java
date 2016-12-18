@@ -15,6 +15,7 @@ import android.os.Bundle;
 import android.provider.Settings;
 import android.support.annotation.NonNull;
 import android.support.v4.app.ActivityCompat;
+import android.support.v4.view.animation.LinearOutSlowInInterpolator;
 import android.support.v7.app.ActionBar;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
@@ -153,13 +154,13 @@ public class MapsActivity extends AppCompatActivity implements
     }
 
     void enterReveal(final View view, int delay) {
-        if(view.isShown()) return;
         int cx = view.getMeasuredWidth() / 2;
         int cy = view.getMeasuredHeight() / 2;
         int finalRadius = Math.max(view.getWidth(), view.getHeight()) / 2;
         view.setOnClickListener(this);
         Animator anim = ViewAnimationUtils.createCircularReveal(view, cx, cy, 0, finalRadius);
         anim.setDuration(500);
+        anim.setInterpolator(new LinearOutSlowInInterpolator());
         anim.setStartDelay(delay);
         anim.addListener(new Animator.AnimatorListener() {
             @Override
@@ -411,9 +412,9 @@ public class MapsActivity extends AppCompatActivity implements
             if(this.polyline != null) {
                 this.polyline.setWidth(10);
             }
-            enterReveal(infoButton, 0);
+            enterReveal(infoButton, 250);
             enterReveal(reportButton, 250);
-            enterReveal(historyButton, 500);
+            enterReveal(historyButton, 250);
             polyline.setWidth(18);
             this.polyline = polyline;
         }
@@ -440,18 +441,23 @@ public class MapsActivity extends AppCompatActivity implements
                 clickInfo(false);
                 break;
             case R.id.history:
-
+                clickHistory();
                 break;
             case R.id.report:
                 clickInfo(true);
                 break;
         }
-        infoButton.setVisibility(View.INVISIBLE);
-        historyButton.setVisibility(View.INVISIBLE);
-        reportButton.setVisibility(View.INVISIBLE);
-        if(polyline != null) {
-            polyline.setWidth(10);
-            polyline = null;
+    }
+
+    private void clickHistory() {
+        if(polyline != null && polylineMap != null) {
+            Road line = polylineMap.get(polyline.getId());
+            String summary = line.getSummary();
+            HistoryFragment fragment = new HistoryFragment();
+            Bundle bundle = new Bundle();
+            bundle.putString("summary", summary);
+            fragment.setArguments(bundle);
+            fragment.show(getFragmentManager(), "popup");
         }
     }
 
