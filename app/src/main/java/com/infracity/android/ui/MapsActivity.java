@@ -2,7 +2,10 @@ package com.infracity.android.ui;
 
 import android.Manifest;
 import android.animation.Animator;
+import android.app.Notification;
+import android.app.PendingIntent;
 import android.app.ProgressDialog;
+import android.app.NotificationManager;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
@@ -19,6 +22,7 @@ import android.support.v4.view.animation.LinearOutSlowInInterpolator;
 import android.support.v7.app.ActionBar;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
+import android.support.v4.app.NotificationCompat;
 import android.support.v7.widget.Toolbar;
 import android.view.ContextMenu;
 import android.view.View;
@@ -61,7 +65,7 @@ public class MapsActivity extends AppCompatActivity implements
         OnMapReadyCallback,
         GoogleMap.OnMyLocationButtonClickListener,
         GoogleMap.OnPolylineClickListener,
-        PathCallback, PlaceSelectionListener, View.OnClickListener {
+        PathCallback, PlaceSelectionListener, View.OnClickListener, View.OnLongClickListener {
 
     private static final int PERMISSIONS_CODE = 1001;
 
@@ -92,6 +96,7 @@ public class MapsActivity extends AppCompatActivity implements
         setupMapView();
         setupSearchView();
         setupActionbar();
+        showLocalNotification();
     }
 
     private void initRetrofit() {
@@ -158,6 +163,7 @@ public class MapsActivity extends AppCompatActivity implements
         int cy = view.getMeasuredHeight() / 2;
         int finalRadius = Math.max(view.getWidth(), view.getHeight()) / 2;
         view.setOnClickListener(this);
+        view.setOnLongClickListener(this);
         Animator anim = ViewAnimationUtils.createCircularReveal(view, cx, cy, 0, finalRadius);
         anim.setDuration(500);
         anim.setInterpolator(new LinearOutSlowInInterpolator());
@@ -460,6 +466,29 @@ public class MapsActivity extends AppCompatActivity implements
             fragment.show(getFragmentManager(), "popup");
         }
     }
+    private void showLocalNotification() {
+        Intent notificationIntent = new Intent(this, MapsActivity.class);
+        notificationIntent.putExtra("open", "report");
+
+        PendingIntent contentIntent = PendingIntent.getActivity(this, 0, notificationIntent, PendingIntent.FLAG_UPDATE_CURRENT);
+
+        NotificationCompat.Builder b = new NotificationCompat.Builder(this);
+
+        b.setAutoCancel(true)
+                .setDefaults(Notification.DEFAULT_ALL)
+                .setWhen(System.currentTimeMillis())
+                .setSmallIcon(R.drawable.cast_ic_notification_small_icon)
+                .setTicker("Infracity")
+                .setContentTitle("Bumpy road?")
+                .setContentText("We found that you are driving on bumpy road, Do you want to report it")
+                .setDefaults(Notification.DEFAULT_LIGHTS| Notification.DEFAULT_SOUND)
+                .setContentIntent(contentIntent)
+                .setContentInfo("Info");
+
+
+        NotificationManager notificationManager = (NotificationManager) this.getSystemService(Context.NOTIFICATION_SERVICE);
+        notificationManager.notify(1, b.build());
+    }
 
     private void clickInfo(boolean report) {
         if(polyline != null && polylineMap != null) {
@@ -474,6 +503,20 @@ public class MapsActivity extends AppCompatActivity implements
             roadInfoFragment.setArguments(bundle);
             roadInfoFragment.show(getFragmentManager(), "popup");
         }
+    }
+
+    @Override
+    public boolean onLongClick(View view) {
+        switch (view.getId()) {
+            case R.id.info:
+                showLocalNotification();
+                break;
+            case R.id.history:
+                break;
+            case R.id.report:
+                break;
+        }
+        return false;
     }
 
     private class FetchRoadsTask extends AsyncTask<Void, Void, Roads> {
