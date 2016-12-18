@@ -184,12 +184,12 @@ public class RoadInfoFragment extends DialogFragment implements View.OnClickList
     boolean isOpen = false;
 
     private void updateUI(final RoadInfo roadInfo) {
-        MapsActivity activity = (MapsActivity) getActivity();
-        if(activity != null) {
-            activity.hideProgressBar();
-        } else {
-            return;
-        }
+//        MapsActivity activity = (MapsActivity) getActivity();
+//        if(activity != null) {
+//            activity.hideProgressBar();
+//        } else {
+//            return;
+//        }
         if(!isDetached() && getActivity() != null) {
             if(roadInfo != null) {
                 final Dialog dialog = getDialog();
@@ -313,10 +313,13 @@ public class RoadInfoFragment extends DialogFragment implements View.OnClickList
 
         @Override
         protected void onPostExecute(ComplaintResponse complaintResponse) {
-            if(complaintResponse == null) {
+            if(complaintResponse == null && complaintResponse.getComplaint() != null) {
                 Toast.makeText(getContext(), "Unable to load complaint details", Toast.LENGTH_SHORT).show();
             } else {
                 Toast.makeText(getContext(), "Complaint details fetched", Toast.LENGTH_SHORT).show();
+                ComplaintFragment complaintFragment = new ComplaintFragment();
+                complaintFragment.setComplaintResponse(complaintResponse);
+                complaintFragment.show(getFragmentManager(), "popup");
             }
         }
     }
@@ -416,13 +419,13 @@ public class RoadInfoFragment extends DialogFragment implements View.OnClickList
 
     private class FetchInfoTask extends AsyncTask<Integer, Void, RoadInfo> {
 
-        @Override
-        protected void onPreExecute() {
-            MapsActivity activity = (MapsActivity) getActivity();
-            if(activity != null) {
-                activity.showProgressBar("Loading Info...");
-            }
-        }
+//        @Override
+//        protected void onPreExecute() {
+//            MapsActivity activity = (MapsActivity) getActivity();
+//            if(activity != null) {
+//                activity.showProgressBar("Loading Info...");
+//            }
+//        }
 
         @Override
         protected RoadInfo doInBackground(Integer... ids) {

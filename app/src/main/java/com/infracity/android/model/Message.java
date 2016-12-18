@@ -18,4 +18,12 @@ public class Message {
     public String getDate() {
         return date;
     }
+
+    public String getMessage() {
+        return message;
+    }
+
+    public String getUser() {
+        return user;
+    }
 }

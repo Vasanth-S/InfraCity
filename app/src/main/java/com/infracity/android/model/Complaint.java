@@ -2,10 +2,12 @@ package com.infracity.android.model;
 
 import com.google.gson.annotations.SerializedName;
 
+import java.io.Serializable;
+
 /**
  * Created by pragadeesh on 18/12/16.
  */
-public class Complaint {
+public class Complaint implements Serializable {
     @SerializedName("number")
     String id;
 

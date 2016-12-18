@@ -54,7 +54,7 @@
             android:layout_width="62dp"
             android:layout_height="62dp"
             android:padding="5dp"
-            android:src="@drawable/timeline_icon"
+            android:src="@drawable/timeline_icon2"
             android:layout_margin="15dp"
             android:elevation="10dp"
             android:visibility="invisible"/>
