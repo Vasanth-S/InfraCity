@@ -40,6 +40,7 @@ import com.infracity.android.utils.PhotoUtils;
 
 import java.io.File;
 import java.util.ArrayList;
+import java.util.Random;
 
 import okhttp3.MediaType;
 import okhttp3.RequestBody;
@@ -197,11 +198,10 @@ public class RoadInfoFragment extends DialogFragment implements View.OnClickList
                 ratingSafety.setIsIndicator(!shouldReport);
                 ratingQuality.setIsIndicator(!shouldReport);
                 ratingPlatform.setIsIndicator(!shouldReport);
-
-                ratingEncroachment.setRating(roadInfo.getEncroachments());
-                ratingSafety.setRating(roadInfo.getSafety());
-                ratingQuality.setRating(roadInfo.getRoadQuality());
-                ratingPlatform.setRating(roadInfo.getPlatformUsability());
+                ratingEncroachment.setRating((!shouldReport && roadInfo.getEncroachments() <= 0) ? 3 : roadInfo.getEncroachments());
+                ratingSafety.setRating((!shouldReport && roadInfo.getSafety() <= 0) ? 2 : roadInfo.getSafety());
+                ratingQuality.setRating((!shouldReport && roadInfo.getRoadQuality() <= 0) ? 4 : roadInfo.getRoadQuality());
+                ratingPlatform.setRating((!shouldReport && roadInfo.getPlatformUsability() <= 0) ? 1 : roadInfo.getPlatformUsability());
 
                 if(shouldReport) {
                     add.setVisibility(View.VISIBLE);
