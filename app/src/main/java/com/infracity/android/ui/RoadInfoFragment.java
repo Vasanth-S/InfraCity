@@ -236,6 +236,18 @@ public class RoadInfoFragment extends DialogFragment implements View.OnClickList
                 ratingPlatform.setRating((!shouldReport && roadInfo.getPlatformUsability() <= 0) ? 1 : roadInfo.getPlatformUsability());
 
                 if(shouldReport) {
+                    View report = dialog.findViewById(R.id.report);
+                    report.setVisibility(View.VISIBLE);
+                    report.setOnClickListener(new View.OnClickListener() {
+                        @Override
+                        public void onClick(View view) {
+                            ReportFragment reportFragment = new ReportFragment();
+                            Bundle args = new Bundle();
+                            args.putInt("id", key);
+                            reportFragment.setArguments(args);
+                            reportFragment.show(getFragmentManager(), "popup");
+                        }
+                    });
                     add.setVisibility(View.VISIBLE);
                     cam = dialog.findViewById(R.id.button1);
                     pick = dialog.findViewById(R.id.button2);
