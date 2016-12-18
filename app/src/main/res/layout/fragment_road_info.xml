@@ -67,6 +67,7 @@
                 android:layout_margin="5dp"
                 android:textSize="20sp"
                 android:textStyle="bold"
+                android:background="#FFEFEFEF"
                 android:padding="10dp"/>
             <LinearLayout
                 android:id="@+id/ratingLayout"
@@ -74,7 +75,9 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:orientation="vertical"
-                android:padding="10dp">
+                android:padding="10dp"
+                android:background="#FFEFEFEF"
+                android:layout_margin="5dp">
                 <TextView
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
