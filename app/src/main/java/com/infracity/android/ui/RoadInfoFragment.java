@@ -25,6 +25,7 @@ import android.view.animation.Animation;
 import android.view.animation.BounceInterpolator;
 import android.view.animation.ScaleAnimation;
 import android.widget.ImageView;
+import android.widget.LinearLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -33,6 +34,7 @@ import com.facebook.drawee.view.SimpleDraweeView;
 import com.google.gson.JsonObject;
 import com.infracity.android.Constants;
 import com.infracity.android.R;
+import com.infracity.android.model.ComplaintResponse;
 import com.infracity.android.model.RoadInfo;
 import com.infracity.android.model.UploadResponse;
 import com.infracity.android.rest.RestService;
@@ -62,6 +64,9 @@ public class RoadInfoFragment extends DialogFragment implements View.OnClickList
     SharedPreferences preferences;
     ViewPager pager;
     ImageView placeHolder;
+
+    LinearLayout complaintPanel;
+
     private View cam;
     private View pick;
 
@@ -194,6 +199,33 @@ public class RoadInfoFragment extends DialogFragment implements View.OnClickList
                 final AppCompatRatingBar ratingQuality = (AppCompatRatingBar) dialog.findViewById(R.id.ratingQuality);
                 final AppCompatRatingBar ratingPlatform = (AppCompatRatingBar) dialog.findViewById(R.id.ratingPlatform);
 
+                complaintPanel = (LinearLayout) dialog.findViewById(R.id.complaintPanel);
+                if(roadInfo.getComplaints() != null && roadInfo.getComplaints().length > 0) {
+                    complaintPanel.setVisibility(View.VISIBLE);
+                    for(String complaintId : roadInfo.getComplaints()) {
+                        TextView textView = new TextView(getContext());
+                        textView.setPadding(10, 10, 10, 10);
+                        textView.setTextSize(16);
+                        textView.setText(complaintId);
+                        textView.setTag(complaintId);
+                        LinearLayout.LayoutParams params = new LinearLayout.LayoutParams(LinearLayout.LayoutParams.MATCH_PARENT , LinearLayout.LayoutParams.MATCH_PARENT);
+                        params.topMargin = 10;
+                        params.bottomMargin = 10;
+                        params.leftMargin = 10;
+                        params.rightMargin = 10;
+                        textView.setOnClickListener(new View.OnClickListener() {
+                            @Override
+                            public void onClick(View view) {
+                                ComplaintDetailTask complaintDetailTask = new ComplaintDetailTask();
+                                complaintDetailTask.execute((String) view.getTag());
+                            }
+                        });
+                        complaintPanel.addView(textView, params);
+                    }
+                } else {
+                    complaintPanel.setVisibility(View.GONE);
+                }
+
                 ratingEncroachment.setIsIndicator(!shouldReport);
                 ratingSafety.setIsIndicator(!shouldReport);
                 ratingQuality.setIsIndicator(!shouldReport);
@@ -259,6 +291,32 @@ public class RoadInfoFragment extends DialogFragment implements View.OnClickList
             } else {
                 Toast.makeText(getContext(), "Unable to load info", Toast.LENGTH_SHORT).show();
                 dismiss();
+            }
+        }
+    }
+
+    private class ComplaintDetailTask extends AsyncTask<String, Void, ComplaintResponse> {
+
+        @Override
+        protected ComplaintResponse doInBackground(String... complaintId) {
+            ComplaintResponse response = null;
+            try {
+                Response<ComplaintResponse> res = service.getComplaintDetails(key, complaintId[0]).execute();
+                if(res.code() == 200) {
+                    response = res.body();
+                }
+            } catch (Exception e) {
+                System.out.println("error " + e.getMessage());
+            }
+            return response;
+        }
+
+        @Override
+        protected void onPostExecute(ComplaintResponse complaintResponse) {
+            if(complaintResponse == null) {
+                Toast.makeText(getContext(), "Unable to load complaint details", Toast.LENGTH_SHORT).show();
+            } else {
+                Toast.makeText(getContext(), "Complaint details fetched", Toast.LENGTH_SHORT).show();
             }
         }
     }

@@ -1,6 +1,7 @@
 package com.infracity.android.rest;
 
 import com.google.gson.JsonObject;
+import com.infracity.android.model.ComplaintResponse;
 import com.infracity.android.model.RoadInfo;
 import com.infracity.android.model.Roads;
 import com.infracity.android.model.UploadResponse;
@@ -49,5 +50,8 @@ public interface RestService {
     @POST("roads/{id}/complaints")
     Call<JsonObject> fileComplaint (@Path("id") int road_id,
                                     @Field("user_id") int user_id);
+
+    @GET("roads/{road_id}/complaints/{id}")
+    Call<ComplaintResponse> getComplaintDetails(@Path("road_id") int road_id, @Path("id") String complaintId);
 
 }
