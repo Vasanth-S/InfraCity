@@ -31,7 +31,8 @@
             android:layout_marginTop="5dp"
             android:layout_marginBottom="5dp"
             android:src="@drawable/cam"
-            android:visibility="invisible" />
+            android:visibility="invisible"
+            android:elevation="10dp"/>
         <ImageView
             android:id="@+id/button2"
             android:layout_width="40dp"
@@ -39,14 +40,17 @@
             android:layout_marginTop="5dp"
             android:layout_marginBottom="5dp"
             android:src="@drawable/drive"
-            android:visibility="invisible" />
+            android:visibility="invisible"
+            android:elevation="10dp"/>
         <ImageView
             android:id="@+id/add"
-            android:layout_width="48dp"
-            android:layout_height="48dp"
+            android:layout_width="58dp"
+            android:layout_height="58dp"
+            android:padding="5dp"
             android:layout_marginTop="5dp"
             android:layout_marginBottom="5dp"
-            android:src="@drawable/add" />
+            android:src="@drawable/add"
+            android:elevation="10dp"/>
     </LinearLayout>
     <ScrollView
         android:layout_below="@id/imagePager"

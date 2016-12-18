@@ -17,8 +17,14 @@ public class RoadInfo {
     @SerializedName("street")
     private String street;
 
-    @SerializedName("encroachments")
+    @SerializedName("encroachment")
     private int encroachments;
+    @SerializedName("safety")
+    private int safety;
+    @SerializedName("platform_usability")
+    private int platformUsability;
+    @SerializedName("road_quality")
+    private int roadQuality;
 
     @SerializedName("photos")
     private ArrayList<String> photos;
@@ -35,7 +41,7 @@ public class RoadInfo {
     }
 
     public int getEncroachments() {
-        return encroachments;
+        return encroachments < 0 ? 0 : encroachments;
     }
 
     public String getStreet() {
@@ -48,5 +54,17 @@ public class RoadInfo {
 
     public String getArea() {
         return area;
+    }
+
+    public int getSafety() {
+        return safety < 0 ? 0 : safety;
+    }
+
+    public int getPlatformUsability() {
+        return platformUsability < 0 ? 0 : platformUsability;
+    }
+
+    public int getRoadQuality() {
+        return roadQuality < 0 ? 0 : roadQuality;
     }
 }

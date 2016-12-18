@@ -207,14 +207,20 @@ public class RoadInfoFragment extends DialogFragment implements View.OnClickList
                     pager.setVisibility(View.VISIBLE);
                     placeHolder.setVisibility(View.INVISIBLE);
                 }
+                final AppCompatRatingBar ratingEncroachment = (AppCompatRatingBar) dialog.findViewById(R.id.ratingEncroachment);
+                final AppCompatRatingBar ratingSafety = (AppCompatRatingBar) dialog.findViewById(R.id.ratingSafety);
+                final AppCompatRatingBar ratingQuality = (AppCompatRatingBar) dialog.findViewById(R.id.ratingQuality);
+                final AppCompatRatingBar ratingPlatform = (AppCompatRatingBar) dialog.findViewById(R.id.ratingPlatform);
+
+                ratingEncroachment.setRating(roadInfo.getEncroachments());
+                ratingSafety.setRating(roadInfo.getSafety());
+                ratingQuality.setRating(roadInfo.getRoadQuality());
+                ratingPlatform.setRating(roadInfo.getPlatformUsability());
+
                 View submit = dialog.findViewById(R.id.submit);
                 submit.setOnClickListener(new View.OnClickListener() {
                     @Override
                     public void onClick(View view) {
-                        AppCompatRatingBar ratingEncroachment = (AppCompatRatingBar) dialog.findViewById(R.id.ratingEncroachment);
-                        AppCompatRatingBar ratingSafety = (AppCompatRatingBar) dialog.findViewById(R.id.ratingSafety);
-                        AppCompatRatingBar ratingQuality = (AppCompatRatingBar) dialog.findViewById(R.id.ratingQuality);
-                        AppCompatRatingBar ratingPlatform = (AppCompatRatingBar) dialog.findViewById(R.id.ratingPlatform);
                         UpdateRatingTask updateRatingTask = new UpdateRatingTask();
                         updateRatingTask.execute((int)ratingEncroachment.getRating(), (int)ratingSafety.getRating(), (int)ratingPlatform.getRating(), (int)ratingQuality.getRating());
 
