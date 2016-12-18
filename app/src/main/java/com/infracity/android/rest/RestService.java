@@ -33,7 +33,7 @@ public interface RestService {
     @POST("users_roads_photo_maps")
     Call<UploadResponse> updatePhoto(@Part("road_id") RequestBody road_id,
                                      @Part("user_id") RequestBody user_id,
-                                     @Part("photo\"; filename=road") RequestBody photo);
+                                     @Part("photo\"; filename=road.jpg") RequestBody photo);
 
     @FormUrlEncoded
     @POST("ratings")

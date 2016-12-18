@@ -22,6 +22,7 @@ import android.view.ViewGroup;
 import android.view.animation.Animation;
 import android.view.animation.BounceInterpolator;
 import android.view.animation.ScaleAnimation;
+import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -54,6 +55,8 @@ public class RoadInfoFragment extends DialogFragment implements View.OnClickList
 
     ImageAdapter imageAdapter;
     SharedPreferences preferences;
+    ViewPager pager;
+    ImageView placeHolder;
 
     private void initRetrofit() {
         Retrofit retrofit = new Retrofit.Builder()
@@ -165,11 +168,9 @@ public class RoadInfoFragment extends DialogFragment implements View.OnClickList
 
     private void updateUI(RoadInfo roadInfo) {
         if(!isDetached() && getActivity() != null) {
+            MapsActivity activity = (MapsActivity) getActivity();
+            activity.hideProgressBar();
             if(roadInfo != null) {
-                MapsActivity activity = (MapsActivity) getActivity();
-                if(activity != null) {
-                    activity.hideProgressBar();
-                }
                 final Dialog dialog = getDialog();
                 View add = dialog.findViewById(R.id.add);
                 final View cam = dialog.findViewById(R.id.button1);
@@ -193,11 +194,19 @@ public class RoadInfoFragment extends DialogFragment implements View.OnClickList
                 });
                 TextView summaryText = (TextView) dialog.findViewById(R.id.summary);
                 summaryText.setText(summary);
-                ViewPager pager = (ViewPager) dialog.findViewById(R.id.imagePager);
+                pager = (ViewPager) dialog.findViewById(R.id.imagePager);
+                placeHolder = (ImageView) dialog.findViewById(R.id.imagePlaceHolder);
                 pager.setOffscreenPageLimit(3);
                 imageAdapter = new ImageAdapter();
                 imageAdapter.setImageUrls(roadInfo.getPhotos());
                 pager.setAdapter(imageAdapter);
+                if(roadInfo.getPhotos() == null || roadInfo.getPhotos().isEmpty()) {
+                    pager.setVisibility(View.INVISIBLE);
+                    placeHolder.setVisibility(View.VISIBLE);
+                } else {
+                    pager.setVisibility(View.VISIBLE);
+                    placeHolder.setVisibility(View.INVISIBLE);
+                }
                 View submit = dialog.findViewById(R.id.submit);
                 submit.setOnClickListener(new View.OnClickListener() {
                     @Override
@@ -338,6 +347,13 @@ public class RoadInfoFragment extends DialogFragment implements View.OnClickList
 
         public void setImageUrls(ArrayList<String> urls) {
             this.urls = urls;
+            if(urls == null || urls.isEmpty()) {
+                pager.setVisibility(View.INVISIBLE);
+                placeHolder.setVisibility(View.VISIBLE);
+            } else {
+                pager.setVisibility(View.VISIBLE);
+                placeHolder.setVisibility(View.INVISIBLE);
+            }
             notifyDataSetChanged();
         }
 
@@ -345,6 +361,13 @@ public class RoadInfoFragment extends DialogFragment implements View.OnClickList
             if(url == null) return;
             if(urls == null) urls = new ArrayList<>();
             urls.add(0, url);
+            if(urls == null || urls.isEmpty()) {
+                pager.setVisibility(View.INVISIBLE);
+                placeHolder.setVisibility(View.VISIBLE);
+            } else {
+                pager.setVisibility(View.VISIBLE);
+                placeHolder.setVisibility(View.INVISIBLE);
+            }
             notifyDataSetChanged();
         }
 
