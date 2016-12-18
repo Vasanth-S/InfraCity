@@ -1,6 +1,7 @@
 package com.infracity.android.ui;
 
 import android.Manifest;
+import android.animation.Animator;
 import android.app.ProgressDialog;
 import android.content.Context;
 import android.content.DialogInterface;
@@ -20,6 +21,7 @@ import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.view.ContextMenu;
 import android.view.View;
+import android.view.ViewAnimationUtils;
 import android.widget.RelativeLayout;
 import android.widget.Toast;
 
@@ -58,7 +60,7 @@ public class MapsActivity extends AppCompatActivity implements
         OnMapReadyCallback,
         GoogleMap.OnMyLocationButtonClickListener,
         GoogleMap.OnPolylineClickListener,
-        PathCallback, PlaceSelectionListener {
+        PathCallback, PlaceSelectionListener, View.OnClickListener {
 
     private static final int PERMISSIONS_CODE = 1001;
 
@@ -69,6 +71,10 @@ public class MapsActivity extends AppCompatActivity implements
     private Polyline polyline;
     private LatLng startLocation;
     private LatLng endLocation;
+
+    private View infoButton;
+    private View historyButton;
+    private View reportButton;
 
     private ProgressDialog progressDialog;
 
@@ -141,6 +147,33 @@ public class MapsActivity extends AppCompatActivity implements
         if(actionBar != null) {
             actionBar.setTitle("");
         }
+        reportButton = findViewById(R.id.report);
+        infoButton = findViewById(R.id.info);
+        historyButton = findViewById(R.id.history);
+    }
+
+    void enterReveal(final View view, int delay) {
+        if(view.isShown()) return;
+        int cx = view.getMeasuredWidth() / 2;
+        int cy = view.getMeasuredHeight() / 2;
+        int finalRadius = Math.max(view.getWidth(), view.getHeight()) / 2;
+        view.setOnClickListener(this);
+        Animator anim = ViewAnimationUtils.createCircularReveal(view, cx, cy, 0, finalRadius);
+        anim.setDuration(500);
+        anim.setStartDelay(delay);
+        anim.addListener(new Animator.AnimatorListener() {
+            @Override
+            public void onAnimationStart(Animator animator) {
+                view.setVisibility(View.VISIBLE);
+            }
+            @Override
+            public void onAnimationEnd(Animator animator) {}
+            @Override
+            public void onAnimationCancel(Animator animator) {}
+            @Override
+            public void onAnimationRepeat(Animator animator) {}
+        });
+        anim.start();
     }
 
 
@@ -378,16 +411,10 @@ public class MapsActivity extends AppCompatActivity implements
             if(this.polyline != null) {
                 this.polyline.setWidth(10);
             }
-            Road line = polylineMap.get(polyline.getId());
+            enterReveal(infoButton, 0);
+            enterReveal(reportButton, 250);
+            enterReveal(historyButton, 500);
             polyline.setWidth(18);
-            Integer key = line.getId();
-            String summary = line.getSummary();
-            Bundle bundle = new Bundle();
-            bundle.putString("summary", summary);
-            bundle.putInt("id", key);
-            RoadInfoFragment roadInfoFragment = new RoadInfoFragment();
-            roadInfoFragment.setArguments(bundle);
-            roadInfoFragment.show(getFragmentManager(), "popup");
             this.polyline = polyline;
         }
     }
@@ -404,6 +431,43 @@ public class MapsActivity extends AppCompatActivity implements
     @Override
     public void onError(Status status) {
 
+    }
+
+    @Override
+    public void onClick(View view) {
+        switch (view.getId()) {
+            case R.id.info:
+                clickInfo(false);
+                break;
+            case R.id.history:
+
+                break;
+            case R.id.report:
+                clickInfo(true);
+                break;
+        }
+        infoButton.setVisibility(View.INVISIBLE);
+        historyButton.setVisibility(View.INVISIBLE);
+        reportButton.setVisibility(View.INVISIBLE);
+        if(polyline != null) {
+            polyline.setWidth(10);
+            polyline = null;
+        }
+    }
+
+    private void clickInfo(boolean report) {
+        if(polyline != null && polylineMap != null) {
+            Road line = polylineMap.get(polyline.getId());
+            Integer key = line.getId();
+            String summary = line.getSummary();
+            Bundle bundle = new Bundle();
+            bundle.putString("summary", summary);
+            bundle.putInt("id", key);
+            bundle.putBoolean("report", report);
+            RoadInfoFragment roadInfoFragment = new RoadInfoFragment();
+            roadInfoFragment.setArguments(bundle);
+            roadInfoFragment.show(getFragmentManager(), "popup");
+        }
     }
 
     private class FetchRoadsTask extends AsyncTask<Void, Void, Roads> {

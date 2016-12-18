@@ -5,6 +5,7 @@ import android.app.Activity;
 import android.app.Dialog;
 import android.app.DialogFragment;
 import android.content.Context;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.net.Uri;
@@ -13,6 +14,7 @@ import android.os.Bundle;
 import android.provider.MediaStore;
 import android.support.v4.view.PagerAdapter;
 import android.support.v4.view.ViewPager;
+import android.support.v7.app.AlertDialog;
 import android.support.v7.widget.AppCompatRatingBar;
 import android.text.TextUtils;
 import android.view.Gravity;
@@ -28,6 +30,7 @@ import android.widget.Toast;
 
 import com.facebook.drawee.drawable.ScalingUtils;
 import com.facebook.drawee.view.SimpleDraweeView;
+import com.google.gson.JsonObject;
 import com.infracity.android.Constants;
 import com.infracity.android.R;
 import com.infracity.android.model.RoadInfo;
@@ -52,11 +55,14 @@ public class RoadInfoFragment extends DialogFragment implements View.OnClickList
     RestService service;
     int key;
     String summary;
+    boolean shouldReport;
 
     ImageAdapter imageAdapter;
     SharedPreferences preferences;
     ViewPager pager;
     ImageView placeHolder;
+    private View cam;
+    private View pick;
 
     private void initRetrofit() {
         Retrofit retrofit = new Retrofit.Builder()
@@ -78,6 +84,7 @@ public class RoadInfoFragment extends DialogFragment implements View.OnClickList
         Bundle bundle = getArguments();
         key = bundle.getInt("id");
         summary = bundle.getString("summary");
+        shouldReport = bundle.getBoolean("report");
         FetchInfoTask task = new FetchInfoTask();
         task.execute(key);
         return dialog;
@@ -88,10 +95,14 @@ public class RoadInfoFragment extends DialogFragment implements View.OnClickList
         switch (view.getId()) {
             case R.id.button1: {
                 captureImage();
+                cam.setVisibility(View.INVISIBLE);
+                pick.setVisibility(View.INVISIBLE);
                 break;
             }
             case R.id.button2: {
                 pickImage();
+                cam.setVisibility(View.INVISIBLE);
+                pick.setVisibility(View.INVISIBLE);
                 break;
             }
         }
@@ -166,32 +177,70 @@ public class RoadInfoFragment extends DialogFragment implements View.OnClickList
 
     boolean isOpen = false;
 
-    private void updateUI(RoadInfo roadInfo) {
-        if(!isDetached() && getActivity() != null) {
-            MapsActivity activity = (MapsActivity) getActivity();
+    private void updateUI(final RoadInfo roadInfo) {
+        MapsActivity activity = (MapsActivity) getActivity();
+        if(activity != null) {
             activity.hideProgressBar();
+        } else {
+            return;
+        }
+        if(!isDetached() && getActivity() != null) {
             if(roadInfo != null) {
                 final Dialog dialog = getDialog();
                 View add = dialog.findViewById(R.id.add);
-                final View cam = dialog.findViewById(R.id.button1);
-                final View pick = dialog.findViewById(R.id.button2);
-                add.setOnClickListener(new View.OnClickListener() {
-                    @Override
-                    public void onClick(View view) {
-                        if(isOpen) {
-                            cam.setVisibility(View.INVISIBLE);
-                            pick.setVisibility(View.INVISIBLE);
-                        } else {
-                            ScaleAnimation animation = new ScaleAnimation(0.9f, 1.1f, 0.9f, 1.1f, Animation.RELATIVE_TO_SELF, 0.5f, Animation.RELATIVE_TO_SELF, 0.5f);
-                            animation.setDuration(200);
-                            animation.setInterpolator(new BounceInterpolator());
-                            view.startAnimation(animation);
-                            enterReveal(cam, 500);
-                            enterReveal(pick, 250);
+                final AppCompatRatingBar ratingEncroachment = (AppCompatRatingBar) dialog.findViewById(R.id.ratingEncroachment);
+                final AppCompatRatingBar ratingSafety = (AppCompatRatingBar) dialog.findViewById(R.id.ratingSafety);
+                final AppCompatRatingBar ratingQuality = (AppCompatRatingBar) dialog.findViewById(R.id.ratingQuality);
+                final AppCompatRatingBar ratingPlatform = (AppCompatRatingBar) dialog.findViewById(R.id.ratingPlatform);
+
+                ratingEncroachment.setIsIndicator(!shouldReport);
+                ratingSafety.setIsIndicator(!shouldReport);
+                ratingQuality.setIsIndicator(!shouldReport);
+                ratingPlatform.setIsIndicator(!shouldReport);
+
+                ratingEncroachment.setRating(roadInfo.getEncroachments());
+                ratingSafety.setRating(roadInfo.getSafety());
+                ratingQuality.setRating(roadInfo.getRoadQuality());
+                ratingPlatform.setRating(roadInfo.getPlatformUsability());
+
+                if(shouldReport) {
+                    add.setVisibility(View.VISIBLE);
+                    cam = dialog.findViewById(R.id.button1);
+                    pick = dialog.findViewById(R.id.button2);
+                    add.setOnClickListener(new View.OnClickListener() {
+                        @Override
+                        public void onClick(View view) {
+                            if (isOpen) {
+                                cam.setVisibility(View.INVISIBLE);
+                                pick.setVisibility(View.INVISIBLE);
+                            } else {
+                                ScaleAnimation animation = new ScaleAnimation(0.9f, 1.1f, 0.9f, 1.1f, Animation.RELATIVE_TO_SELF, 0.5f, Animation.RELATIVE_TO_SELF, 0.5f);
+                                animation.setDuration(200);
+                                animation.setInterpolator(new BounceInterpolator());
+                                view.startAnimation(animation);
+                                enterReveal(cam, 500);
+                                enterReveal(pick, 250);
+                            }
+                            isOpen = !isOpen;
                         }
-                        isOpen = !isOpen;
-                    }
-                });
+                    });
+                    View submit = dialog.findViewById(R.id.submit);
+                    submit.setVisibility(View.VISIBLE);
+                    submit.setOnClickListener(new View.OnClickListener() {
+                        @Override
+                        public void onClick(View view) {
+                            if(imageAdapter != null && imageAdapter.getCount() > 0) {
+                                UpdateRatingTask updateRatingTask = new UpdateRatingTask();
+                                updateRatingTask.execute((int) ratingEncroachment.getRating(),
+                                        (int) ratingSafety.getRating(),
+                                        (int) ratingPlatform.getRating(),
+                                        (int) ratingQuality.getRating());
+                            } else {
+                                Toast.makeText(getContext(), "Upload atleast one image before rating", Toast.LENGTH_SHORT).show();
+                            }
+                        }
+                    });
+                }
                 TextView summaryText = (TextView) dialog.findViewById(R.id.summary);
                 summaryText.setText(summary);
                 pager = (ViewPager) dialog.findViewById(R.id.imagePager);
@@ -207,25 +256,6 @@ public class RoadInfoFragment extends DialogFragment implements View.OnClickList
                     pager.setVisibility(View.VISIBLE);
                     placeHolder.setVisibility(View.INVISIBLE);
                 }
-                final AppCompatRatingBar ratingEncroachment = (AppCompatRatingBar) dialog.findViewById(R.id.ratingEncroachment);
-                final AppCompatRatingBar ratingSafety = (AppCompatRatingBar) dialog.findViewById(R.id.ratingSafety);
-                final AppCompatRatingBar ratingQuality = (AppCompatRatingBar) dialog.findViewById(R.id.ratingQuality);
-                final AppCompatRatingBar ratingPlatform = (AppCompatRatingBar) dialog.findViewById(R.id.ratingPlatform);
-
-                ratingEncroachment.setRating(roadInfo.getEncroachments());
-                ratingSafety.setRating(roadInfo.getSafety());
-                ratingQuality.setRating(roadInfo.getRoadQuality());
-                ratingPlatform.setRating(roadInfo.getPlatformUsability());
-
-                View submit = dialog.findViewById(R.id.submit);
-                submit.setOnClickListener(new View.OnClickListener() {
-                    @Override
-                    public void onClick(View view) {
-                        UpdateRatingTask updateRatingTask = new UpdateRatingTask();
-                        updateRatingTask.execute((int)ratingEncroachment.getRating(), (int)ratingSafety.getRating(), (int)ratingPlatform.getRating(), (int)ratingQuality.getRating());
-
-                    }
-                });
             } else {
                 Toast.makeText(getContext(), "Unable to load info", Toast.LENGTH_SHORT).show();
                 dismiss();
@@ -234,6 +264,8 @@ public class RoadInfoFragment extends DialogFragment implements View.OnClickList
     }
 
     private class UpdateRatingTask extends AsyncTask<Integer, Void, Boolean> {
+
+        private float average = 0f;
 
         @Override
         protected void onPreExecute() {
@@ -250,6 +282,7 @@ public class RoadInfoFragment extends DialogFragment implements View.OnClickList
                 int uid = preferences.getInt(Constants.PREFERENCE_UID, 0);
                 Response<Object> response = service.updateInfo(key, uid, ratings[0], ratings[1], ratings[2], ratings[3]).execute();
                 result = response.code() == 201;
+                average =  (ratings[0] + ratings[1] + ratings[2] + ratings[3])/4;
             } catch (Exception e) {
                 System.out.println("Update failed");
             }
@@ -264,8 +297,61 @@ public class RoadInfoFragment extends DialogFragment implements View.OnClickList
             }
             if(aBoolean) {
                 Toast.makeText(getContext(), "Ratings registered", Toast.LENGTH_SHORT).show();
+                if(average < 3.0f) {
+                    new AlertDialog.Builder(getContext())
+                            .setTitle("Report your concern")
+                            .setMessage("Do you wish to file a complaint to the Greater corporation of Chennai?")
+                            .setPositiveButton(android.R.string.yes, new DialogInterface.OnClickListener() {
+                                @Override
+                                public void onClick(DialogInterface dialogInterface, int i) {
+                                    FileComplaintTask fileComplaintTask = new FileComplaintTask();
+                                    fileComplaintTask.execute(key);
+                                    dialogInterface.dismiss();
+                                }
+                            })
+                            .setNegativeButton(android.R.string.no, new DialogInterface.OnClickListener() {
+                                @Override
+                                public void onClick(DialogInterface dialogInterface, int i) {
+                                    dialogInterface.dismiss();
+                                    dismiss();
+                                }
+                            })
+                            .show();
+                } else {
+                    dismiss();
+                }
             } else {
                 Toast.makeText(getContext(), "Ratings failed", Toast.LENGTH_SHORT).show();
+            }
+        }
+    }
+
+    private class FileComplaintTask extends AsyncTask<Integer, Void, String> {
+
+        @Override
+        protected String doInBackground(Integer... ids) {
+            String result = null;
+            try {
+                Response<JsonObject> response = service.fileComplaint(ids[0], preferences.getInt(Constants.PREFERENCE_UID, 0)).execute();
+                if(response.code() == 201) {
+                    JsonObject object = response.body();
+                    if(object != null && object.has("id")) {
+                        result = object.get("id").getAsString();
+                    }
+                }
+            } catch (Exception e) {
+                System.out.println("Exception " + e.getMessage());
+            }
+            return result;
+        }
+
+        @Override
+        protected void onPostExecute(String complaintId) {
+            if(TextUtils.isEmpty(complaintId)) {
+                Toast.makeText(getContext(), "Unable to file complaint, Please try later", Toast.LENGTH_SHORT).show();
+            } else {
+                Toast.makeText(getContext(), "Complaint filed - " + complaintId, Toast.LENGTH_SHORT).show();
+                dismiss();
             }
         }
     }
@@ -366,7 +452,7 @@ public class RoadInfoFragment extends DialogFragment implements View.OnClickList
         public void addUrl(String url) {
             if(url == null) return;
             if(urls == null) urls = new ArrayList<>();
-            urls.add(0, url);
+            urls.add(url);
             if(urls == null || urls.isEmpty()) {
                 pager.setVisibility(View.INVISIBLE);
                 placeHolder.setVisibility(View.VISIBLE);

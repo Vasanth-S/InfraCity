@@ -24,4 +24,39 @@
             android:layout_height="wrap_content"
             android:name="com.google.android.gms.location.places.ui.SupportPlaceAutocompleteFragment"/>
     </android.support.v7.widget.Toolbar>
+    <ImageView
+        android:id="@+id/report"
+        android:layout_width="58dp"
+        android:layout_height="58dp"
+        android:padding="5dp"
+        android:src="@drawable/add"
+        android:layout_alignParentBottom="true"
+        android:layout_centerHorizontal="true"
+        android:layout_margin="20dp"
+        android:elevation="10dp"
+        android:visibility="invisible"/>
+    <ImageView
+        android:id="@+id/info"
+        android:layout_width="58dp"
+        android:layout_height="58dp"
+        android:padding="5dp"
+        android:layout_toLeftOf="@id/report"
+        android:src="@drawable/info"
+        android:layout_alignParentBottom="true"
+        android:layout_centerHorizontal="true"
+        android:layout_margin="20dp"
+        android:elevation="10dp"
+        android:visibility="invisible"/>
+    <ImageView
+        android:id="@+id/history"
+        android:layout_width="58dp"
+        android:layout_height="58dp"
+        android:padding="5dp"
+        android:layout_toRightOf="@id/report"
+        android:src="@drawable/timeline_icon"
+        android:layout_alignParentBottom="true"
+        android:layout_centerHorizontal="true"
+        android:layout_margin="20dp"
+        android:elevation="10dp"
+        android:visibility="invisible"/>
 </RelativeLayout>
