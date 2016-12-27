@@ -46,7 +46,7 @@ public class ReportFragment extends DialogFragment {
         dialog.setContentView(R.layout.fragment_report);
         StringBuilder sb = new StringBuilder();
         TextView detail = (TextView) dialog.findViewById(R.id.details);
-        sb.append("Name : ").append(preferences.getString(Constants.PREFERENCE_DISPLAY_NAME, "")).append("\n\n")
+        sb.append("Name : Pragadeesh Kanagavel").append("\n\n")
             .append("Email : ").append(preferences.getString(Constants.PREFERENCE_EMAIL, "")).append("\n\n");
         detail.setText(sb.toString());
 

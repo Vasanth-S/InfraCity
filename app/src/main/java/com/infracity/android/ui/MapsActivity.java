@@ -96,7 +96,6 @@ public class MapsActivity extends AppCompatActivity implements
         setupMapView();
         setupSearchView();
         setupActionbar();
-        showLocalNotification();
     }
 
     private void initRetrofit() {
@@ -302,7 +301,7 @@ public class MapsActivity extends AppCompatActivity implements
                 for(String provider : providers) {
                     Location currentLocation = lm.getLastKnownLocation(provider);
                     if(currentLocation != null) {
-                        LatLng latLng = new LatLng(currentLocation.getLatitude(), currentLocation.getLongitude());
+                        LatLng latLng = new LatLng(13.055321, 80.257817);
                         mMap.moveCamera(CameraUpdateFactory.newLatLng(latLng));
                         mMap.animateCamera(CameraUpdateFactory.zoomTo(15));
                         fetchRoads();
@@ -465,29 +464,6 @@ public class MapsActivity extends AppCompatActivity implements
             fragment.setArguments(bundle);
             fragment.show(getFragmentManager(), "popup");
         }
-    }
-    private void showLocalNotification() {
-        Intent notificationIntent = new Intent(this, MapsActivity.class);
-        notificationIntent.putExtra("open", "report");
-
-        PendingIntent contentIntent = PendingIntent.getActivity(this, 0, notificationIntent, PendingIntent.FLAG_UPDATE_CURRENT);
-
-        NotificationCompat.Builder b = new NotificationCompat.Builder(this);
-
-        b.setAutoCancel(true)
-                .setDefaults(Notification.DEFAULT_ALL)
-                .setWhen(System.currentTimeMillis())
-                .setSmallIcon(R.drawable.cast_ic_notification_small_icon)
-                .setTicker("Infracity")
-                .setContentTitle("Bumpy road?")
-                .setContentText("We found that you are driving on bumpy road, Do you want to report it")
-                .setDefaults(Notification.DEFAULT_LIGHTS| Notification.DEFAULT_SOUND)
-                .setContentIntent(contentIntent)
-                .setContentInfo("Info");
-
-
-        NotificationManager notificationManager = (NotificationManager) this.getSystemService(Context.NOTIFICATION_SERVICE);
-        notificationManager.notify(1, b.build());
     }
 
     private void clickInfo(boolean report) {

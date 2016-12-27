@@ -1,7 +1,9 @@
 {
   "project_info": {
     "project_number": "255573547465",
-    "project_id": "nth-platform-152007"
+    "firebase_url": "https://nth-platform-152007.firebaseio.com",
+    "project_id": "nth-platform-152007",
+    "storage_bucket": "nth-platform-152007.appspot.com"
   },
   "client": [
     {
@@ -13,12 +15,16 @@
       },
       "oauth_client": [
         {
-          "client_id": "255573547465-r73ti43fuus0f3skq6n3hv9qjqamvhvo.apps.googleusercontent.com",
+          "client_id": "255573547465-0glsgjsg5qj04bruvcnj8jha31r0sfho.apps.googleusercontent.com",
           "client_type": 1,
           "android_info": {
             "package_name": "com.infracity.android",
-            "certificate_hash": "284CC3E298D917A4C963B4BB240E4BC4910E72DF"
+            "certificate_hash": "03CB8C07E8304143F336588A4ADF4D9D52819B7A"
           }
+        },
+        {
+          "client_id": "255573547465-hqfaph6h01b5a3c4m8slh2b0ko3o6n93.apps.googleusercontent.com",
+          "client_type": 3
         },
         {
           "client_id": "255573547465-o5vlntnm03sqkevbeafqtmn5807mta9u.apps.googleusercontent.com",
@@ -27,7 +33,7 @@
       ],
       "api_key": [
         {
-          "current_key": "AIzaSyAWp0mJBrKTQYzF1joWedusWr7sHUZTnE4"
+          "current_key": "AIzaSyCs3sGOsb3mQtUzOV3BGQnA4R5rHOpjNuI"
         }
       ],
       "services": {
@@ -35,11 +41,16 @@
           "status": 1
         },
         "appinvite_service": {
-          "status": 1,
-          "other_platform_oauth_client": []
+          "status": 2,
+          "other_platform_oauth_client": [
+            {
+              "client_id": "255573547465-hqfaph6h01b5a3c4m8slh2b0ko3o6n93.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
         },
         "ads_service": {
-          "status": 1
+          "status": 2
         }
       }
     }
