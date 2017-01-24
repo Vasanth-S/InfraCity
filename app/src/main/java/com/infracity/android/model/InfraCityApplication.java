@@ -31,10 +31,12 @@ public class InfraCityApplication extends Application {
                 text.append(line);
             }
             e.close();
+            Constants.SERVER = String.format("http://%s", text.toString());
         } catch (IOException e) {
             e.printStackTrace();
+        } catch (Exception e) {
+            e.printStackTrace();
         }
-        Constants.SERVER = String.format("http://%s", text.toString());
         System.out.println("Server IP " + Constants.SERVER);
     }
 }
